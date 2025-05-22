@@ -1,0 +1,107 @@
+﻿PCA;id;foto;localidade;ordemives;sp;sp_ives;biome;sex;CS;LogCS;lat;long;factraj;facgp;clades;fac;pch
+1;0;1005- MN 23233 Sapajus xanthosternos (F);BA - Belmonte;2;Sapajus_xanthosternos;Sapajus_xanthosternos;Forest;F;9.3574;2.2362;-15.8202;-39.0976;0;bot0;bot;AF;8
+2;1;1006- MN 23240 Sapajus libidinosus (F);BA - Faz. Sucurui, itajuípe;6;Sapajus_libidinosus;Sapajus_libidinosus;Savanna;F;8.7935;2.1740;-14.6672;-39.4301;1;top1;top;SV_lib;25
+3;2;356 - MG 21764 Cebus apella;RO - UHE de Samuel, rio Jamari, afl. dir. rio Madeira;5;Sapajus_apella;Sapajus_apella;Forest;F;10.4205;2.3438;-8.7525;-63.4557;0;top0;top;AM;15
+4;3;357 - MG 21765 Cebus apella;RO - UHE de Samuel, rio Jamari, afl. dir. rio Madeira;5;Sapajus_apella;Sapajus_apella_2;Forest;F;9.7030;2.2724;-8.7525;-63.4557;0;top0;top;AM;15
+5;4;358 - MG 21766 Cebus apella;RO - UHE de Samuel, rio Jamari, afl. dir. rio Madeira;5;Sapajus_apella;Sapajus_apella_3;Forest;M;10.6796;2.3683;-8.7525;-63.4557;0;top0;top;AM;15
+6;5;359 - MG 26521 Cebus apella;PA - Oriximiná, Rio Saracazinho;5;Sapajus_apella;Sapajus_apella_4;Forest;F;9.4246;2.2433;-1.4779;-56.3749;0;top0;top;AM;15
+7;6;360 - MG 21494 Cebus apella;PA - Oriximiná, Cachoeira Porteira;5;Sapajus_apella;Sapajus_apella_5;Forest;M;11.6153;2.4523;-1.0917;-57.0386;0;top0;top;AM;15
+8;7;361 - MG 21497 Cebus apella;PA - Oriximiná, Cachoeira Porteira;5;Sapajus_apella;Sapajus_apella_6;Forest;M;11.2716;2.4223;-1.0917;-57.0386;0;top0;top;AM;15
+9;8;812 - MUZUSP 6317 Sapajus cay (M);MT - Rio Aricá, Fazenda Arigá;3;Sapajus_cay;Sapajus_cay;Savanna;M;8.8266;2.1778;-14.1840;-56.6203;1;bot1;bot;SV_cay;17
+10;9;813 - MUZUSP 6319 Sapajus cay (M);MT - Rio Aricá Fazenda Arigá;3;Sapajus_cay;Sapajus_cay_2;Savanna;M;9.1614;2.2150;-14.1840;-56.6203;1;bot1;bot;SV_cay;17
+11;10;814 - MUZUSP 6324 Sapajus cay (F);MT - Cáceres;3;Sapajus_cay;Sapajus_cay_3;Savanna;F;8.8798;2.1838;-16.2910;-57.9778;1;bot1;bot;SV_cay;17
+12;12;816 - MUZUSP 2582 Sapajus xanthosternos (M);BA - Senhor do Bonfim;2;Sapajus_xanthosternos;Sapajus_xanthosternos_2;Forest;M;9.2358;2.2231;-10.4749;-40.1362;0;bot0;bot;AF;8
+13;13;817 - MUZUSP 2583 Sapajus xanthosternos (M);BA - Senhor do Bonfim;2;Sapajus_xanthosternos;Sapajus_xanthosternos_3;Forest;M;9.5214;2.2535;-10.4749;-40.1362;0;bot0;bot;AF;8
+14;14;818 - MUZUSP 2585 Sapajus xanthosternos (F);BA - Senhor do Bonfim;2;Sapajus_xanthosternos;Sapajus_xanthosternos_4;Forest;F;8.9576;2.1925;-10.4749;-40.1362;0;bot0;bot;AF;8
+15;15;819 - MUZUSP 2586 Sapajus xanthosternos (M);BA - Senhor do Bonfim;2;Sapajus_xanthosternos;Sapajus_xanthosternos_5;Forest;M;11.0512;2.4025;-10.4749;-40.1362;0;bot0;bot;AF;8
+16;16;820 - MUZUSP 5915 Sapajus robustus (M);MG - Baixo Rio Suaçui;4;Sapajus_robustus;Sapajus_robustus;Forest;M;10.0176;2.3043;-18.9135;-42.0949;0;bot0;bot;AF;18
+17;17;821 - MUZUSP 5916 Sapajus robustus (M);MG - Baixo Rio Suaçui;4;Sapajus_robustus;Sapajus_robustus_2;Forest;M;10.0796;2.3105;-18.9135;-42.0949;0;bot0;bot;AF;18
+18;18;822 - MUZUSP 5919 Sapajus robustus (F);MG - Baixo Rio Suaçui;4;Sapajus_robustus;Sapajus_robustus_3;Forest;F;9.5113;2.2525;-18.9135;-42.0949;0;bot0;bot;AF;18
+19;19;823 - MUZUSP 5920 Sapajus robustus (F);MG - Baixo Rio Suaçui;4;Sapajus_robustus;Sapajus_robustus_4;Forest;F;9.6873;2.2708;-18.9135;-42.0949;0;bot0;bot;AF;18
+20;21;825 - MUZUSP 11095 Sapajus libidinosus (F);GO - Anicuns - Fazenda Agua Clara;6;Sapajus_libidinosus;Sapajus_libidinosus_2;Savanna;F;9.2805;2.2279;-16.3553;-50.0211;1;top1;top;SV_lib;25
+21;22;826 - MUZUSP 11096 Sapajus libidinosus (M);GO - Anicuns - Fazenda Agua Clara;6;Sapajus_libidinosus;Sapajus_libidinosus_3;Savanna;M;10.0527;2.3078;-16.3553;-50.0211;1;top1;top;SV_lib;25
+22;23;827 - MUZUSP 11097 Sapajus libidinosus (M);GO - Anicuns - Fazenda Agua Clara;6;Sapajus_libidinosus;Sapajus_libidinosus_4;Savanna;M;10.6838;2.3687;-16.3553;-50.0211;1;top1;top;SV_lib;25
+23;24;828 - MUZUSP 5321 Sapajus macrocephalus (M);AM - Eirunepé, Santa Cruz, Rio Eiru;5;Sapajus_apella;Sapajus_apella_7;Forest;M;11.6328;2.4538;-7.2762;-70.3004;0;top0;top;AM;15
+24;25;829 - MUZUSP 5318 Sapajus macrocephalus (F);AM - Eirunepé, Santa Cruz, Rio Eiru;5;Sapajus_apella;Sapajus_apella_8;Forest;F;10.3756;2.3395;-7.2762;-70.3004;0;top0;top;AM;15
+25;26;830 - MUZUSP 779 Sapajus macrocephalus (M);AM - Rio Juruá;5;Sapajus_apella;Sapajus_apella_9;Forest;M;11.6862;2.4584;-2.6336;-65.8203;0;top0;top;AM;15
+26;27;831 - MUZUSP 10542 Sapajus macrocephalus (F);AM - Eirunepé;5;Sapajus_apella;Sapajus_apella_10;Forest;F;9.2623;2.2260;-6.6611;-69.8671;0;top0;top;AM;15
+27;28;832 - MUZUSP 19622 Sapajus nigritus (F);SP - São Vicente, Estação Engenheiro Ferraz;1;Sapajus_nigritus;Sapajus_nigritus;Forest;F;9.1200;2.2105;-23.9759;-46.6185;0;bot0;bot;AF;19
+28;29;833 - MUZUSP 6015 Sapajus nigritus (F);SP - Porto Cabral, Rio Paraná;1;Sapajus_nigritus;Sapajus_nigritus_2;Forest;F;9.6491;2.2669;-24.5105;-47.7003;0;bot0;bot;AF;19
+29;30;834 - MUZUSP 6887 Sapajus nigritus (M);SP - Boracéia;1;Sapajus_nigritus;Sapajus_nigritus_3;Forest;M;11.5849;2.4497;-22.1219;-48.8236;0;bot0;bot;AF;19
+30;31;835 - MUZUSP 19620 Sapajus nigritus (M);SP - São Vicente, Estação Engenheiro Ferraz;1;Sapajus_nigritus;Sapajus_nigritus_4;Forest;M;11.8650;2.4736;-23.9759;-46.6185;0;bot0;bot;AF;19
+31;32;BUBADUÉ3035_Sapajus_nigritus_MN_5676_Fêmea_mld;ES - Santa Teresa. Colonia do Milanez, 25 de julho;1;Sapajus_nigritus;Sapajus_nigritus_5;Forest;F;8.7897;2.1736;-19.8457;-40.5520;0;bot0;bot;AF;19
+32;33;BUBADUÉ3036_Sapajus_nigritus_MN_5719_Fêmea_mld;ES - Santa Teresa, São João de Petropolis - Mata da Escola;1;Sapajus_nigritus;Sapajus_nigritus_6;Forest;F;9.3686;2.2374;-19.7982;-40.6828;0;bot0;bot;AF;19
+33;34;BUBADUÉ3037_Sapajus_nigritus_MN_5724_Fêmea_mld;ES - Santa Teresa, São João de Petropolis - Mata da Escola;1;Sapajus_nigritus;Sapajus_nigritus_7;Forest;F;9.4986;2.2511;-19.7982;-40.6828;0;bot0;bot;AF;19
+34;35;BUBADUÉ3038_Sapajus_nigritus_MN_5712_Fêmea_mld;ES - Santa Teresa, São João de Petropolis - Mata da Escola;1;Sapajus_nigritus;Sapajus_nigritus_8;Forest;F;9.0854;2.2067;-19.7982;-40.6828;0;bot0;bot;AF;19
+35;36;BUBADUÉ3039_Sapajus_nigritus_MN_5731_Fêmea_mld;ES - Santa Teresa, São João de Petropolis - Mata da Escola;1;Sapajus_nigritus;Sapajus_nigritus_9;Forest;F;9.1919;2.2183;-19.7982;-40.6828;0;bot0;bot;AF;19
+36;37;BUBADUÉ3040_Sapajus_nigritus_MN_5684_Macho_mld;ES - Santa Teresa, São João de Petropolis - Mata da Escola;1;Sapajus_nigritus;Sapajus_nigritus_10;Forest;M;10.3963;2.3414;-19.7982;-40.6828;0;bot0;bot;AF;19
+37;38;BUBADUÉ3041_Sapajus_nigritus_MN_5681_Macho_mle;ES - Santa Teresa. Colonia do Milanez, 25 de julho;1;Sapajus_nigritus;Sapajus_nigritus_11;Forest;M;10.8479;2.3840;-19.8457;-40.5520;0;bot0;bot;AF;19
+38;39;BUBADUÉ3042_Sapajus_nigritus_MN_5699_Macho_mld;ES - Santa Teresa, São João de Petropolis - Mata da Escola;1;Sapajus_nigritus;Sapajus_nigritus_12;Forest;M;9.5351;2.2550;-19.7982;-40.6828;0;bot0;bot;AF;19
+40;41;BUBADUÉ3044_Sapajus_nigritus_MN_5701_Macho_mle;MG - Além Paraíba , Fazenda São Geraldo;1;Sapajus_nigritus;Sapajus_nigritus_14;Forest;M;8.7199;2.1656;-21.8217;-42.5932;0;bot0;bot;AF;19
+41;42;BUBADUÉ3203_Sapajus_libidinosus_MN_23321_Fêmea_mld;PE - Serrita;6;Sapajus_libidinosus;Sapajus_libidinosus_5;Savanna;F;8.6700;2.1599;-7.9473;-39.2960;1;top1;top;SV_lib;25
+42;43;BUBADUÉ3204_Sapajus_libidinosus_MN_4619_Fêmea_mld;MG - Faz. Cabacal, Uberaba;6;Sapajus_libidinosus;Sapajus_libidinosus_6;Savanna;F;8.9018;2.1863;-19.4232;-48.3035;1;top1;top;SV_lib;25
+43;44;BUBADUÉ3205_Sapajus_libidinosus_MN_4572_Fêmea_mle;MG -  Araguari;6;Sapajus_libidinosus;Sapajus_libidinosus_7;Savanna;F;8.2514;2.1104;-18.6566;-48.2869;1;top1;top;SV_lib;25
+44;45;BUBADUÉ3206_Sapajus_libidinosus_MN_4585_Fêmea_mld;MG - *;6;Sapajus_libidinosus;Sapajus_libidinosus_8;Savanna;F;8.7977;2.1745;-17.5013;-44.5608;1;top1;top;SV_lib;25
+45;46;BUBADUÉ3207_Sapajus_libidinosus_MN_4526_Fêmea_mld;MG -  Araguari;6;Sapajus_libidinosus;Sapajus_libidinosus_9;Savanna;F;8.4643;2.1359;-18.6566;-48.2869;1;top1;top;SV_lib;25
+46;47;BUBADUÉ3208_Sapajus_libidinosus_MN_4618_Macho_mld;MG - Faz. Pantano, Patos de Minas;6;Sapajus_libidinosus;Sapajus_libidinosus_10;Savanna;M;9.4026;2.2410;-18.5958;-46.8248;1;top1;top;SV_lib;25
+47;48;BUBADUÉ3209_Sapajus_libidinosus_MN_4624_Macho_mld;"MG - Faz. Violeta; Estrella do Sul, Cascalho Rico";6;Sapajus_libidinosus;Sapajus_libidinosus_11;Savanna;M;8.7064;2.1641;-18.5719;-47.9147;1;top1;top;SV_lib;25
+48;49;BUBADUÉ3210_Sapajus_libidinosus_MN_4587_Macho_mld;MG -  Araguari;6;Sapajus_libidinosus;Sapajus_libidinosus_12;Savanna;M;10.6192;2.3627;-18.6566;-48.2869;1;top1;top;SV_lib;25
+49;50;BUBADUÉ3211_Sapajus_libidinosus_MN_4586_Macho_mld;MG - Faz. Cabacal, Uberaba;6;Sapajus_libidinosus;Sapajus_libidinosus_13;Savanna;M;9.4712;2.2483;-19.4232;-48.3035;1;top1;top;SV_lib;25
+50;51;BUBADUÉ3212_Sapajus_libidinosus_MN_4575_Macho_mld;MG -  Araguari;6;Sapajus_libidinosus;Sapajus_libidinosus_14;Savanna;M;10.3628;2.3382;-18.6566;-48.2869;1;top1;top;SV_lib;25
+51;52;BUBADUÉ3223_Sapajus_robustus_MN_21189_Macho_mld;ES - Faz. Samambaia, Conceição da Barra;4;Sapajus_robustus;Sapajus_robustus_5;Forest;M;10.2391;2.3262;-18.5794;-40.0782;0;bot0;bot;AF;18
+52;53;BUBADUÉ3224_Sapajus_robustus_MN_21194_Macho_mld;ES - Mata São João, Vila São Domingos;4;Sapajus_robustus;Sapajus_robustus_6;Forest;M;10.5583;2.3569;-19.5883;-40.5419;0;bot0;bot;AF;18
+53;54;BUBADUÉ3225_Sapajus_robustus_MN_21218_Macho_mld;BA - Sapucaieira, Alcobaça;4;Sapajus_robustus;Sapajus_robustus_7;Forest;M;8.5171;2.1421;-17.5018;-39.3346;0;bot0;bot;AF;18
+54;55;BUBADUÉ3226_Sapajus_robustus_MN_21214_Macho_mld;BA - Mucurizinho, Mucuri;4;Sapajus_robustus;Sapajus_robustus_8;Forest;M;10.6971;2.3700;-17.9768;-39.9636;0;bot0;bot;AF;18
+55;56;BUBADUÉ3227_Sapajus_robustus_MN_21217_Fêmea_mld;BA - Sapucaieira, Alcobaça;4;Sapajus_robustus;Sapajus_robustus_9;Forest;F;7.9986;2.0793;-17.5018;-39.3346;0;bot0;bot;AF;18
+56;57;BUBADUÉ3228_Sapajus_robustus_MN_21209_Fêmea_mld;BA - Mucurizinho, Mucuri;4;Sapajus_robustus;Sapajus_robustus_10;Forest;F;8.5502;2.1460;-17.9768;-39.9636;0;bot0;bot;AF;18
+57;58;BUBADUÉ3229_Sapajus_robustus_MN_21219_Fêmea_mld;BA - Sapucaieira, Alcobaça;4;Sapajus_robustus;Sapajus_robustus_11;Forest;F;8.9689;2.1938;-17.5018;-39.3346;0;bot0;bot;AF;18
+58;59;BUBADUÉ3230_Sapajus_robustus_MN_21222_Fêmea_mld;BA - Sapucaieira, Alcobaça;4;Sapajus_robustus;Sapajus_robustus_12;Forest;F;8.3210;2.1188;-17.5018;-39.3346;0;bot0;bot;AF;18
+59;60;BUBADUÉ3238_Sapajus_xanthosternos_MN_23228_Macho_mld;MG - Belmonte, Belo Horizonte;2;Sapajus_xanthosternos;Sapajus_xanthosternos_6;Forest;M;8.4753;2.1372;-19.8493;-43.9036;0;bot0;bot;AF;8
+60;62;BUBADUÉ3249_Sapajus_cay_MN_4831_Fêmea_mld;MS - Maracajú;3;Sapajus_cay;Sapajus_cay_4;Savanna;F;8.2897;2.1150;-21.4349;-55.6552;1;bot1;bot;SV_cay;17
+61;64;BUBADUÉ3250_Sapajus_cay_MN_4633_Fêmea_mld;MT - Cuiabá;3;Sapajus_cay;Sapajus_cay_5;Savanna;F;8.7153;2.1651;-15.6836;-56.0652;1;bot1;bot;SV_cay;17
+62;65;BUBADUÉ3251_Sapajus_cay_MN_4826_Fêmea_mld;MT - Cuiabá;3;Sapajus_cay;Sapajus_cay_6;Savanna;F;7.9584;2.0742;-15.6836;-56.0652;1;bot1;bot;SV_cay;17
+63;66;BUBADUÉ3252_Sapajus_cay_MN_8502_Macho_mld;"MT - Posto Jacaré; Baixo Kuluene, Alto Xingu";3;Sapajus_cay;Sapajus_cay_7;Savanna;M;10.5534;2.3564;-13.5165;-53.0973;1;bot1;bot;SV_cay;17
+64;67;BUBADUÉ3253_Sapajus_cay_MN_23357_Macho_mld;MT - Rio Arraias, Alto Xingu;3;Sapajus_cay;Sapajus_cay_8;Savanna;M;10.0036;2.3029;-12.0037;-54.4538;1;bot1;bot;SV_cay;17
+65;68;BUBADUÉ3254_Sapajus_cay_MN_4833_Macho_mld;MS - Maracajú;3;Sapajus_cay;Sapajus_cay_9;Savanna;M;8.1482;2.0978;-21.4349;-55.6552;1;bot1;bot;SV_cay;17
+69;67;1508_5788;MS - Salobra;3;Sapajus_cay;Sapajus_cay_10;Savanna;M;;;-20.2019;-56.5484;1;bot1;bot;SV_cay;17
+70;68;1510_19696;MT - Rio Piquiri;3;Sapajus_cay;Sapajus_cay_11;Savanna;F;;;-17.2332;-56.0112;1;bot1;bot;SV_cay;17
+71;69;1520_19680;"MS - Porto XV de Novembro; Faz. Santa Bárbara";3;Sapajus_cay;Sapajus_cay_12;Savanna;F;;;-21.7254;-52.2508;1;bot1;bot;SV_cay;17
+72;70;1526_4299;MS - Salobra;3;Sapajus_cay;Sapajus_cay_13;Savanna;M;;;-20.2019;-56.5484;1;bot1;bot;SV_cay;17
+73;71;1527_6323;"MT - Bom Jesus do Araguaia; Palmeiras";3;Sapajus_cay;Sapajus_cay_14;Savanna;M;;;-12.2890;-51.8575;1;bot1;bot;SV_cay;17
+74;72;1529_3363;MS - Corumbá;3;Sapajus_cay;Sapajus_cay_15;Savanna;F;;;-19.0316;-57.6311;1;bot1;bot;SV_cay;17
+75;73;1533_3361;MS - Corumbá;3;Sapajus_cay;Sapajus_cay_16;Savanna;M;;;-19.0316;-57.6311;1;bot1;bot;SV_cay;17
+76;74;1537_3360;MS - Corumbá;3;Sapajus_cay;Sapajus_cay_17;Savanna;F;;;-19.0316;-57.6311;1;bot1;bot;SV_cay;17
+77;75;1538_3770;MS - Coxim;3;Sapajus_cay;Sapajus_cay_18;Savanna;F;;;-18.3172;-54.7432;1;bot1;bot;SV_cay;17
+79;76;1542_28539;"MS - Brasilândia; Faz. Barma";3;Sapajus_cay;Sapajus_cay_20;Savanna;F;;;-21.2585;-51.9110;1;bot1;bot;SV_cay;17
+80;77;1544_3775;MS - Miranda;3;Sapajus_cay;Sapajus_cay_21;Savanna;M;;;-20.2481;-56.3995;1;bot1;bot;SV_cay;17
+81;78;1548_4317;MS - Corumbá;3;Sapajus_cay;Sapajus_cay_22;Savanna;M;;;-19.0316;-57.6311;1;bot1;bot;SV_cay;17
+82;79;1551_6964;MT - São Domingos, Rio das Mortes;3;Sapajus_cay;Sapajus_cay_23;Savanna;F;;;-13.5485;-51.4127;1;bot1;bot;SV_cay;17
+83;80;1556_6960;MT - São Domingos, Rio das Mortes;3;Sapajus_cay;Sapajus_cay_24;Savanna;M;;;-13.5485;-51.4127;1;bot1;bot;SV_cay;17
+84;81;1559_6963;MT - São Domingos, Rio das Mortes;3;Sapajus_cay;Sapajus_cay_25;Savanna;F;;;-13.5485;-51.4127;1;bot1;bot;SV_cay;17
+85;82;1562_6970;MT - São Domingos, Rio das Mortes;3;Sapajus_cay;Sapajus_cay_26;Savanna;M;;;-13.5485;-51.4127;1;bot1;bot;SV_cay;17
+86;83;1567_6961;MT - Porto Guaporé, Rio 7 de Setembro;3;Sapajus_cay;Sapajus_cay_27;Savanna;M;;;-13.5791;-52.4261;1;bot1;bot;SV_cay;17
+87;84;1576_10716;PA - Lagoa Ipavu, Parque do Xingu;3;Sapajus_cay;Sapajus_cay_28;Savanna;M;;;-12.1412;-53.4357;1;bot1;bot;SV_cay;17
+88;85;1581_6321;MT - Rio Aricá, Fazenda Aricá;3;Sapajus_cay;Sapajus_cay_29;Savanna;F;;;-15.3056;-57.5487;1;bot1;bot;SV_cay;17
+89;86;1583_2883;MA - Miritiba;5;Sapajus_apella;Sapajus_apella_11;Forest;M;;;-2.5977;-43.4591;0;top0;top;AM;15
+90;87;1585_2745;MA - Miritiba;5;Sapajus_apella;Sapajus_apella_12;Forest;F;;;-2.5977;-43.4591;0;top0;top;AM;15
+91;88;1587_2488;MA - Boa Vista;6;Sapajus_libidinosus;Sapajus_libidinosus_15;Savanna;M;;;-2.4777;-43.3053;1;top1;top;SV_lib;25
+92;89;1591_2364;"GO - Faz. Esperança; Rio Araguaia";6;Sapajus_libidinosus;Sapajus_libidinosus_16;Savanna;F;;;-14.2950;-50.9634;1;top1;top;SV_lib;25
+93;90;1592_2365;"GO - Faz. Esperança; Rio Araguaia";6;Sapajus_libidinosus;Sapajus_libidinosus_17;Savanna;M;;;-14.2950;-50.9634;1;top1;top;SV_lib;25
+94;91;1593_10642;GO - Goiânia;6;Sapajus_libidinosus;Sapajus_libidinosus_18;Savanna;F;;;-16.6693;-49.3766;1;top1;top;SV_lib;25
+95;92;1595_7907;"GO - Jataí; Faz. Santa Adéllia";6;Sapajus_libidinosus;Sapajus_libidinosus_19;Savanna;M;;;-18.1220;-51.5565;1;top1;top;SV_lib;25
+96;93;1596_7905;"GO - Jataí; Faz. Santa Adéllia";6;Sapajus_libidinosus;Sapajus_libidinosus_20;Savanna;M;;;-18.1220;-51.5565;1;top1;top;SV_lib;25
+97;94;1597_1430;GO - Ponte Ipê Arcado (Sobre Parnaraiba);6;Sapajus_libidinosus;Sapajus_libidinosus_21;Savanna;F;;;-18.4168;-49.1945;0;top0;top;AM;15
+98;95;1599_21325;"PA - Cachoeira do Espelho; Rio Xingu";5;Sapajus_apella;Sapajus_apella_13;Forest;M;;;-3.8012;-52.5331;0;top0;top;AM;15
+99;96;1600_10546;PA - Bravo, Rio Amazonas;5;Sapajus_apella;Sapajus_apella_14;Forest;M;;;-1.3240;-51.4370;0;top0;top;AM;15
+100;97;1602_19595;PA - Fordlândia;5;Sapajus_apella;Sapajus_apella_15;Forest;F;;;-3.8283;-55.4939;0;top0;top;AM;15
+101;98;1604_19591;PA - Fordlândia;5;Sapajus_apella;Sapajus_apella_16;Forest;M;;;-3.8283;-55.4939;0;top0;top;AM;15
+102;99;1608_19604;"PA - Urucutituba; Rio Tapajós";5;Sapajus_apella;Sapajus_apella_17;Forest;M;;;-3.1385;-58.1584;0;top0;top;AM;15
+103;100;1610_19608;"PA - Urucutituba; Rio Tapajós";5;Sapajus_apella;Sapajus_apella_18;Forest;F;;;-3.1385;-58.1584;0;top0;top;AM;15
+104;101;1613_5753;"PA - Caxiricatuba; Rio Tapajós";5;Sapajus_apella;Sapajus_apella_19;Forest;M;;;-2.1892;-54.9118;0;top0;top;AM;15
+105;102;1616_5118;"PA - Caxiricatuba; Rio Tapajós";5;Sapajus_apella;Sapajus_apella_20;Forest;F;;;-2.1892;-54.9118;0;top0;top;AM;15
+106;103;1618_5123;"PA - Aruã; Rio Arapiuns";5;Sapajus_apella;Sapajus_apella_21;Forest;F;;;-2.6523;-55.7241;0;top0;top;AM;15
+107;104;1620_5674;"PA - Aruã; Rio Arapiuns";5;Sapajus_apella;Sapajus_apella_22;Forest;M;;;-2.6523;-55.7241;0;top0;top;AM;15
+108;105;1625_4291;PA - Boim;5;Sapajus_apella;Sapajus_apella_23;Forest;M;;;-2.8134;-55.1924;1;top1;top;AM;15
+109;106;1627_25452;PA - Boca do Bacajá;5;Sapajus_apella;Sapajus_apella_24;Forest;M;;;-2.6292;-55.1530;2;top2;top;AM;15
+110;107;1629_19635;"SC - São Francisco do Sul; Figueira do Pontal";1;Sapajus_nigritus;Sapajus_nigritus_15;Forest;F;;;-26.1680;-48.6651;0;bot0;bot;AF;19
+111;108;1633_19639;"SC - São Francisco do Sul; Figueira do Pontal";1;Sapajus_nigritus;Sapajus_nigritus_16;Forest;M;;;-26.1680;-48.6651;0;bot0;bot;AF;19
