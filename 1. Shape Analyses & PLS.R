@@ -9,6 +9,7 @@ setwd("C:/Users/Lourenço/OneDrive/UFSM/LabMastozoo/SAPAJUS/Data - From forests 
 
 #install_github("geomorphR/geomorph", ref = "Stable", build_vignettes = TRUE)
 #install_github("mlcollyer/RRPP")
+#install_github("fawda123/ggord")
 #install.packages("geiger")
 #install.packages("RColorBrewer")
 #install.packages("vegan")
@@ -76,9 +77,7 @@ latitude <-as.numeric(fatores$lat)
 
 longitude <- as.numeric(fatores$long)
 
-size <- as.numeric(fatores$LogCS)
-
-### Execute a GPA - Alinha tudo e tira o impacto da dimensionalidade dos dados crus ###
+### Execute a GPA - Alinha tudo e tira o impacto da dimensionalidade dos dados crus
 
 plot(dados) # dados crus
 gpa <- gpagen(dados)
@@ -134,7 +133,6 @@ dev.off()
 
 PCA <- gm.prcomp(gpa$coords)
 summary(PCA)
-
 
 ### Basicamente os parâmetros para personalizar os plots
 
@@ -387,13 +385,13 @@ summary(PCA)
 main_components <- PCA$x
 
 correlacao_bio <- cor(cbind(main_components),as.numeric(biome))
-print(correlacao)
+print(correlacao_bio)
 
 correlacao <- cor(cbind(main_components),size)
 print(correlacao)
 
 
-pca_data <- data.frame(pca_scores = main_components, Size = fatores$LogCS)
+pca_data <- data.frame(pca_scores = main_components, Size = log(gpa$Csize))
 
 size_correlations <- correlacao
 bio_cor <- correlacao_bio
@@ -464,22 +462,26 @@ print(resultado_teste)
 
 par(mfrow=c(3,1))
 
-plot(PC1, size, main = "Relação entre PC1 e LogCS", xlab = "PC1", ylab = "LogCS",pch = 21, bg = cores_fac, col = cores_fac, cex = 2,)
-abline(lm(size ~ PC1), col = "red")
+plot(pca_data$Size, PC1,
+     main = "Relação entre PC1 e logCS", xlab = "logCS", ylab = "PC1",
+     pch = 21, bg = cores_fac, col = cores_fac, cex = 2) + 
+     abline(lm(PC1~Size,pca_data), col = "red")
 
 resultado_teste <- cor.test(PC2, size, method = "pearson")
 print(resultado_teste)
 
-plot(PC2, size, main = "Relação entre PC2 e LogCS", xlab = "PC2", ylab = "LogCS",pch = 21, bg = cores_fac, col = cores_fac, cex = 2,)
-abline(lm(size ~ PC2), col = "red")
+plot(pca_data$Size, PC2,
+     main = "Relação entre PC2 e logCS", xlab = "logCS", ylab = "PC2",
+     pch = 21, bg = cores_fac, col = cores_fac, cex = 2) + 
+  abline(lm(PC2~Size,pca_data), col = "red")
 
 resultado_teste <- cor.test(PC3, size, method = "pearson")
 print(resultado_teste)
 
-plot(PC3, size, main = "Relação entre PC3 e LogCS", xlab = "PC3", ylab = "LogCS",pch = 21, bg = cores_fac, col = cores_fac, cex = 2,)
-abline(lm(size ~ PC3), col = "blue")
-par(mfrow=c(1,1))
-
+plot(pca_data$Size, PC3,
+     main = "Relação entre PC3 e logCS", xlab = "logCS", ylab = "PC3",
+     pch = 21, bg = cores_fac, col = cores_fac, cex = 2) + 
+  abline(lm(PC3~Size,pca_data), col = "blue")
 
 ####################################### CVA ############################################
 
@@ -688,11 +690,24 @@ par(mfrow=c(1,1))
 
 dev.off()
 
+### Shapiro - Wilk - Aplicar onde necessário conferir a homogeneidade/normalidade das variáveis (geralmente feito nos resíduos de modelos)
 
-############################### ANÁLISES DE VARIÂNCIA ####################################
+size <- gpa$Csize
+head (size)
 
+shapiro.test(size)
+summary(size)
 
-####################### Analises de Variância Univariadas Qualitativas ###################
+hist(size)
+qqnorm(size) 
+qqline(size)
+
+dev.off()
+
+############################### ANÁLISES DE VARIÂNCIA 
+
+####################### Analises de Variância Univariadas Qualitativas 
+
 df <- data.frame(Species = species, Latitude = latitude, Biome = biome, Envi = Fac, Size = size, Sex = sex)
 
 aov_res <- aov(Size~Species, data = df)
@@ -724,7 +739,7 @@ fitl1 <- procD.lm(Shape~log(Size)*Biome, data = gdf, iter = 999)
 fitl2 <- procD.lm(Shape~log(Size)*Species, data = gdf, iter = 999) ### Dimorfismo sexual 
 fitl3 <- procD.lm(Shape~log(Size)*Fac, data = gdf, iter = 999)
 fitl4 <- procD.lm(Shape~log(Size)*Sex, data = gdf, iter = 999)
-fitl5 <- procD.lm(Shape~log(Size)*Fac*Sex, data = gdf, iter = 999) ### Interação CS : Biome (?)
+fitl5 <- procD.lm(Shape~log(Size)*Fac*Sex, data = gdf, iter = 999)
 
 summary(fitl1)
 summary(fitl2)
@@ -734,293 +749,21 @@ summary(fitl5)
 
 ## Não tendo interações com o fator Sexo, as análises podem ser feitas com ambos juntos
 
-########################## Phylo Analisys #########################
-
-# Métodos Filogenéticos Comparativos
-# Carregar arquivo tps da mandíbula
-tps<-readland.tps("Datasets/tps/avglocsex.tps",specID = "ID", readcurves = FALSE)
-gpa<-gpagen(tps)
-shape<-gpa$coords
-size<-gpa$Csize
-ref.mand<-mshape(shape)
-
-shape.2d<-two.d.array(shape)
-shape.2d <- as.matrix(shape.2d,ncol(32))
-
-# Carregar classificadores a partir de lista externa
-plan<-read.csv("Planilhas/avglocsex.csv",sep=";")
-fac <- as.factor(plan$fac)
-species <- as.factor(plan$sp)
-names <- plan$sp_ives
-sexis <- as.factor(plan$sex)
-
-names(fac) <- names
-names(species) <- names
-names(sexis) <- names
-
-###### Minha análise filogenética pra vários spécimes #####
-# Carregar árvore filogen?tica no formato nexus
-tree<-read.tree("Datasets/trees/AVGLOCSEX_Lima.tre")
-plot(tree)
-tree<-compute.brlen(tree,1) # definir comprimento dos ramos = 1
-
-# Plotar Filogenia no espaço de forma (phylomorphoespace)
-
-tree$tip.label
-
-dimnames(shape.2d)[[1]] <- paste(names)
-
-pms <- gm.prcomp(shape.2d,phy=tree)
-pms
-plot(pms,phylo=TRUE)
-
-# PCA filogenética
-pPCA_BM<-phyl.pca(tree,pms$x[,1:16],method="BM")
-pPCA_BM
-phylomorphospace(tree,pPCA_BM$S[,1:2],label="horizontal")
-
-pPCA_L<-phyl.pca(tree,pms$x[,1:16],method="lambda")
-pPCA_L
-phylomorphospace(tree,pPCA_L$S[,1:2],label="horizontal")
-
-GP <- gridPar(n.col.cell = 100, pt.bg = "gray", pt.size = 0.8, tar.pt.bg = "cyan", 
-              tar.pt.size = 0.8,tar.out.col = "gray10", tar.out.cex = 0.5, 
-              grid.col = "white", grid.lwd = 0.5,txt.pos = 1, txt.col = "steelblue") ## grids personalizados
-
-plot(tree)
-nodelabels()
-
-sinal.k<-physignal(shape.2d,tree,iter=999)
-sinal.k
-physignal.z(shape.2d, tree)
-
-# Sinal Filogenético para tamanho do crânio
-names(size)<-names
-sinal.k.size<-physignal(size,tree,iter=999)
-sinal.k.size
-
-# Valor observado de K
-K_obs <- sinal.k.size$phy.signal
-
-# Permutações (nula)
-K_null <- sinal.k.size$random.K
-
-# Effect size como Z-score
-effect_size <- (K_obs - mean(K_null)) / sd(K_null)
-effect_size
-library(phytools)
-
-# lnCS é um vetor nomeado com os nomes das espécies
-lambda_result <- phylosig(tree, size, method = "lambda", test = TRUE)
-print(lambda_result)
-
-### com esses códigos da pra fazer análises entre espécies (médias), mas como o meu foco era a análise entre ambientes considerando toda a variação, não foquei nisso
-
-fac <- as.factor(plan$fac)
-names(fac)<-names
-
-fit<-procD.lm(shape ~ fac, iter = 999)
-summary(fit)
-
-# Execute o modelo (forma como resposta, grupo como preditor)
-
-fit <- procD.pgls(shape.2d ~ Size, phy = tree, data=gdf,iter = 999) 
-summary(fit)
-
-# as politomias entre os grupos são muito próximas, o controle filogenético pode estar "apagando" qualquer diferença na forma entre eles.
-fit <- procD.pgls(shape.2d ~ Size*Fac, phy = tree, data=gdf, iter = 999) 
-summary(fit)
-
-dimnames(gdf$Shape)[[3]] <- paste (names)
-
-fitl1 <- procD.pgls(Shape~log(Size)*Biome, data = gdf, , phy = tree, iter = 999) 
-fitl2 <- procD.pgls(Shape~log(Size)*Species, data = gdf, , phy = tree, iter = 999) 
-fitl3 <- procD.pgls(Shape~log(Size)*Fac, data = gdf, , phy = tree, iter = 999)
-fitl4 <- procD.pgls(Shape~log(Size)*Sex, data = gdf, , phy = tree, iter = 999)
-fitl5 <- procD.pgls(Shape~log(Size)*Sex*Biome, data = gdf, , phy = tree, iter = 999)
-
-summary(fitl1)
-summary(fitl2)
-summary(fitl3)
-summary(fitl4)
-summary(fitl5)
-
-### ANOVA Filogenética - Essa parte do script não está muito correta
-dim(shape)  # Verifique o número de linhas e colunas de shape
-length(names)  # Verifique o comprimento de names
-formula <- (size~Fac)
-names(Fac) <- names
-
-library(nlme)
-library(ape)
-
-# Matriz de covariância filogenética
-C <- vcv(tree, corr = TRUE)
-
-# Ajustar modelo GLS multivariado com essa matriz
-model <- gls(cbind(PC) ~ Fac, correlation = corSymm(value = C[lower.tri(C)], fixed = TRUE))
-summary(model)
-
-
-###### PGLS de acordo com o R. Maestri
-########################################################################
-# Calcular forma média por grupos
-shape.2d<-two.d.array(gpa$coords)
-shape.2d.means<-rowsum(shape.2d,species)/as.vector(table(species))
-shape.means<-arrayspecs(shape.2d.means,dim(gpa$coords)[1],dim(gpa$coords)[2]) #arrayspecs transforma matriz em tps
-shape.means
-
-size.means<-rowsum(size,species)/as.vector(table(species))
-size.means <- log(size.means)
-
-# Carregar árvore filogen?tica no formato nexus
-tree<-read.tree("Datasets/trees/MCC_Lima_calibrated.tre")
-plot(tree)
-tree<- drop.tip(tree,c("Sapajus_macrocephalus","Sapajus_flavius" ,"Cebus_albifrons", "Cebus_capucinus"))
-tree<-compute.brlen(tree,1) # definir comprimento dos ramos = 1
-
-# Plotar Filogenia no espaço de forma (phylomorphoespace)
-# pms<-plotGMPhyloMorphoSpace(tree,shape.means,plot.param=list(t.bg="green",txt.col="black",n.bg="black",n.cex=1,lwd=2,l.col="blue")) #não funciona mais
-pms <- gm.prcomp(shape.means,phy=tree)
-pms
-plot(pms,phylo=TRUE)
-
-# 3d
-pca<-gm.prcomp(shape.means)
-phylomorphospace(tree,pms$x[,1:2])
-phylomorphospace3d(tree,pms$x[,1:3])
-
-# PCA filogenética
-pPCA_BM<-phyl.pca(tree,pms$x[,1:5],method="BM")
-pPCA_BM
-phylomorphospace(tree,pPCA_BM$S[,1:2],label="horizontal")
-
-pPCA_L<-phyl.pca(tree,pca$x[,1:5],method="lambda")
-pPCA_L
-phylomorphospace(tree,pPCA_L$S[,1:2],label="horizontal")
-
-GP <- gridPar(n.col.cell = 100, pt.bg = "gray", pt.size = 0.8, tar.pt.bg = "cyan", 
-              tar.pt.size = 0.8,tar.out.col = "gray10", tar.out.cex = 0.5, 
-              grid.col = "white", grid.lwd = 0.5,txt.pos = 1, txt.col = "steelblue") ## grids personalizados
-
-plot(tree)
-nodelabels()
-
-# Visualização das formas ancestrais # n1 = raiz # 1st forma em cinza, 2nd em preto
-ancestral.shapes<-arrayspecs(pms$ancestors,18,2)
-ancestral.shapes
-mshp <- mshape(shape.means)
-par(mfrow = c(1, 1))
-plotRefToTarget(mshp,ancestral.shapes[,,1],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 4)
-plotRefToTarget(ancestral.shapes[,,1],ancestral.shapes[,,2],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 4)
-plotRefToTarget(ancestral.shapes[,,1],ancestral.shapes[,,3],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 4)
-plotRefToTarget(ancestral.shapes[,,1],ancestral.shapes[,,4],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 4)
-plotRefToTarget(ancestral.shapes[,,1],ancestral.shapes[,,5],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 4)
-
-par(mfrow = c(2, 3))
-plotRefToTarget(ancestral.shapes[,,1],shape.means[,,"Sapajus_xanthosternos"],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 3)
-plotRefToTarget(ancestral.shapes[,,1],shape.means[,,"Sapajus_robustus"],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 3)
-plotRefToTarget(ancestral.shapes[,,1],shape.means[,,"Sapajus_nigritus"],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 3)
-plotRefToTarget(ancestral.shapes[,,1],shape.means[,,"Sapajus_libidinosus"],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 3)
-plotRefToTarget(ancestral.shapes[,,1],shape.means[,,"Sapajus_cay"],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 3)
-plotRefToTarget(ancestral.shapes[,,1],shape.means[,,"Sapajus_apella"],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 3)
-
-# Sinal Filogenético para forma do crânio
-sinal.k<-physignal(shape.means,tree,iter=999)
-sinal.k
-physignal.z(shape.means,tree)
-
-# Sinal Filogenético para tamanho do crânio
-size.means<-rowsum(size,species)/as.vector(table(species)) # m?dia por esp?cie
-sinal.k.size<-physignal(size.means,tree,iter=999)
-sinal.k.size
-
-# Visualizar tamanho na filogenia
-size.means1<-as.vector(size.means)
-names(size.means1)=rownames(size.means)
-tree1<-compute.brlen(tree,method="Grafen") # make ultrametric
-# cores
-contMap(tree1,size.means1)
-
-# Phylogenetic Generalized Least Squares (PGLS) 
-
-# Variáveis hipotéticas para usar como exemplo
-
-nomes<-levels(as.factor(plan$sp))
-temp<-as.numeric(plan$bio1)
-prec<-as.numeric(plan$bio12)
-bio.means <- c("Sapajus_xanthosternos"="Forest","Sapajus_robustus"="Forest","Sapajus_nigritus"="Forest",
-               "Sapajus_libidinosus"="Savanna","Sapajus_cay"="Savanna","Sapajus_apella"="Forest")
-temp.means<-scale(rowsum(temp,species)/as.vector(table(species)))
-prec.means<-scale(rowsum(prec,species)/as.vector(table(species)))
-spec <- levels(as.factor(plan$sp))
-names(temp.means)<-nomes
-names(prec.means)<-nomes
-names(bio.means)<-nomes
-names(spec) <- nomes
-
-# PGLS
-gdf.m<-geomorph.data.frame(Shape=shape.means,Size=size.means,Species = spec,Temp=temp.means,Prec=prec.means,Biome=bio.means,tree=tree)
-dimnames(gdf.m$Shape)[[3]] <- paste (nomes)
-
-fitl1 <- procD.lm(Shape~Size*Biome, data = gdf.m, iter = 999) 
-fitl2 <- procD.lm(Shape~Species, data = gdf.m, iter = 999) 
-
-summary(fitl1)
-summary(fitl2)
-
-fitl1 <- procD.pgls(Shape~log(Size)*Biome, data = gdf.m, phy = tree, iter = 999) 
-fitl2 <- procD.pgls(Shape~log(Size)*Species, data = gdf.m, phy = tree, iter = 999) 
-
-summary(fitl1)
-summary(fitl2)
-
-p<-procD.lm(shape.means~size.means*prec,data=gdf.m)
-summary(p)
-
-pgls.shape<-procD.pgls(shape.means~size.means*prec,tree,data=gdf.m,iter=999) #inclui a árvore filogenética #procrustes
-summary(pgls.shape)
-
-# Plot
-p.plot<-
-  plot(pgls.shape,type="regression",predictor=as.numeric(prec.means),reg.type="RegScore",xlab="Precipitation")
-reg.score<-as.vector(p.plot$RegScore)
-names(reg.score)=rownames(p.plot$RegScore)
-phylomorphospace(tree,cbind(prec.means,reg.score))
-
-# Variação de forma associada
-preds <- shape.predictor(shape.means, x = prec.means, Intercept = TRUE,
-                         predmin = min(prec.means),
-                         predmax = max(prec.means))
-
-plotRefToTarget(preds$predmin,preds$predmax,method = "points", outline = Sapajusoutline$outline, gridPars=GP, mag = 2)
-
-# PGLS size
-pgls.size<-procD.pgls(size.means~temp.means,tree,data=gdf,iter=999)
-summary(pgls.size)
-plot(size.means~temp.means)
-
-pgls.biome <- procD.pgls(shape.means~bio.means,tree,data=gdf,iter=999)
-summary(pgls.biome)
-
-### ANOVA Filogenética - Essa parte do script não está muito correta, não funciona
-sz <- as.matrix(size.means, ncol(1))
-grp <- as.factor(bio.means)
-names(grp)=nomes
-names(sz)=nomes
-
-x = aov.phylo(sz~grp,tree, nsim=999, test="Pillai")
-
 
 ################# Modelos de regressão linear simples automatizado ###########################
 
-variables <- c("lat", "long", "bio1","bio2", "bio3","bio4","bio5","bio6","bio7","bio8", "bio9","bio10","bio11", "bio12","bio13","bio14", "bio15","bio16","bio17", "bio18", "bio19", 
-               "npp", "humid", "soilmoist")
+variables <- c("lat", "long", "bio1","bio2", "bio3","bio4","bio5","bio6","bio7","bio8", "bio9","bio10","bio11", "bio12","bio13","bio14", "bio15","bio16","bio17", "bio18", "bio19", "npp", "humid", "soilmoist")
+
 # Lista para armazenar os resultados
 model_results <- list()
 
-names(fatores)
 fatores[,c(4,5,11:32)] <- scale(fatores[,c(4,5,11:32)])
+Males[,c(2,3,10:31)] <- scale(Males[,c(2,3,10:31)])
+Females[,c(2,3,10:31)] <- scale(Females[,c(2,3,10:31)])
+fatores$CS <- log(gpa$Csize)
+Males$CS <- log(M_gpa$Csize)
+Females$CS <- log(F_gpa$Csize)
+
 
 # Loop para criar um modelo linear para cada variável
 for (var in variables) {
@@ -1028,7 +771,7 @@ for (var in variables) {
   formula <- as.formula(paste("CS ~", var))
   
   # Ajustando o modelo linear
-  model <- lm(formula, data = fatores)  # 'locations' é o dataframe com seus dados
+  model <- lm(formula, data = Females)  # 'locations' é o dataframe com seus dados
   
   # Armazenando os resultados na lista
   model_results[[var]] <- summary(model)
@@ -1060,13 +803,10 @@ plot_data <- plot_data %>%
 
 ggplot(plot_data, aes(x = Beta, y = reorder(Variable, Beta), color = Significant)) +
   geom_point(size = 4) +  # Adiciona os pontos para os coeficientes Beta
-  geom_errorbarh(aes(xmin = Beta - 1.96 * R_Squared, xmax = Beta + 1.96 * R_Squared), height = 0.2) +  # Intervalos de confiança
   labs(
-    title = "Comparação de Coeficientes Beta com Intervalos de Confiança",
-    subtitle = "Intervalos de confiança com coeficientes beta das variáveis preditoras",
-    x = "Coeficiente Beta",
-    y = "Variáveis",
-    caption = "Fonte: Autor"
+    x = "Beta",
+    y = "Variables",
+    caption = "Source: Author"
   ) +
   theme_minimal() +  # Usando um tema minimalista
   scale_color_manual(values = c("TRUE" = "deepskyblue3", "FALSE" = "rosybrown")) +  # Cores para modelos significativos e não significativos
@@ -1078,94 +818,46 @@ ggplot(plot_data, aes(x = Beta, y = reorder(Variable, Beta), color = Significant
     plot.caption = element_text(size = 10, face = "italic", hjust = 1)  # Estilizando a legenda
   ) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "black") +  # Linha vertical no zero
-  coord_cartesian(xlim = c(-0.555, 0.55)) +  # Definindo um limite fixo para o eixo X, centrando o zero
+  coord_cartesian(xlim = c(-0.04, 0.04)) +  # Definindo um limite fixo para o eixo X, centrando o zero
   theme(legend.position = "none")  # Remover a legenda se não for necessária
 
-### Shapiro - Wilk - Aplicar onde necessário conferir a homogeneidade/normalidade das variáveis (geralmente feito nos resíduos de modelos)
+write.csv(plot_data, file = "simple_lm_f.csv")
 
-Size <- log(size)
-head (Size)
-
-shapiro.test(Size)
-summary(Size)
-
-hist(Size)
-qqnorm(Size) 
-qqline(Size)
-
-dev.off()
 
 # Violin plot
 
 ggplot(df, aes(x = Envi, y = Size, fill = Envi)) +
-  geom_violin(trim = FALSE) +
+  geom_violin(trim = FALSE) + geom_jitter(width = 0.2) +
   geom_boxplot(width = 0.1, fill = "white", color = "black") +
   scale_fill_manual(values = cores_fac, labels = c("Amazon","Atlantic Forest", "Savanna")) +  # Usando as cores definidas acima
   labs(x = "Biome", y = "LogCS", title = "Violin Plot of Size by Biome") +
   theme_minimal()
 
-ggplot(df, aes(x = Biome, y = Size, fill = Biome)) +
-  geom_violin(trim = FALSE) +
-  geom_boxplot(width = 0.1, fill = "white", color = "black") +
-  scale_fill_manual(values = c("darkgreen", "goldenrod1"), labels = c("Forest", "Savanna")) +  # Usando as cores definidas acima
-  labs(x = "Biome", y = "LogCS", title = "Violin Plot of Size by Biome") +
-  theme_minimal()
-
-# Ajuste para Regressão Linear
-
-modelobio <- lm(Size ~ Biome, data = df) # Adjusted R-squared:  0.1412
-summary(modelobio)
-
-modelo <- lm(Size ~ Species, data = df) #S. cay e S. lib aparecem com maiores coeficientes de redução
-summary(modelo)
-
-modelosex <- lm(Size ~ sex, data = df) #Machos maiores
-summary(modelo)
-
-model <- lm (log(CS) ~ lat, data = fatores)
-summary(model)
-
-main_components <- PCA$x
-biome_pca <- cbind(PCs = main_components, Biome = biome, Sex = sex, Species = as.factor(fatores$sp), Size = log(gpa$Csize))
-
-head(biome_pca)
-
-biome_pca <- as.data.frame(biome_pca)
-
-## Gráfico de Efeito
-
-#install.packages("effects")
-library(effects)
-
-plot(allEffects(modelobio)["Biome"])
-plot(predictorEffects(modelobio,residuals=T))
-
-
 ########################################################################
 # MANOVA (Multivariate Analysis of Variance) ## Método R. Maestri
 
-manova<-procD.lm(shape~species, iter=999, RRPP= TRUE) # P/ espécies
+manova<-procD.lm(shape~log(size)+species, iter=999, RRPP= TRUE) # P/ espécies
 summary(manova)
 
-manova.sex<-procD.lm(shape~sex, iter=999, RRPP= TRUE) # P/ sexo
+manova.sex<-procD.lm(shape~log(size)+sex, iter=999, RRPP= TRUE) # P/ sexo
 summary(manova.sex)
 
-manova.bio<-procD.lm(shape~biome, iter=999, RRPP= TRUE) # P/ bioma
+manova.bio<-procD.lm(shape~log(size)+biome, iter=999, RRPP= TRUE) # P/ bioma
 summary(manova.bio)
 
 # MANOVA Wilks's lambda #Mais prox de 0 mais diferença entre grupos #Teste parecido com o de p. Para comparar entre os grupos
 
 PCA
-manova.w<-manova(PCA$x[,1:16]~biome)
+manova.w<-manova(PCA$x[,1:16]~log(size)+biome)
 summary(manova.w,test="Wilks")
 
-manova.w<-manova(PCA$x[,1:16]~Fac)
+manova.w<-manova(PCA$x[,1:16]~log(size)+Fac)
 summary(manova.w,test="Wilks")
 
-manova.w.sex<-manova(PCA$x[,1:32]~sex)
+manova.w.sex<-manova(PCA$x[,1:16]~log(size)+sex)
 summary(manova.w.sex,test="Wilks")
 
-manova.w.spec<-manova(PCA$x[,1:16]~log(gpa$Csize)*sex)
+manova.w.spec<-manova(PCA$x[,1:16]~log(gpa$Csize)*species)
 summary(manova.w.spec,test="Wilks")
 
 manova.w<-manova(PCA$x[,1:16]~ log(gpa$Csize)*biome)
@@ -1176,7 +868,7 @@ summary(manova.w,test="Wilks")
 
 # Pairwise comparisons
 require(RRPP)
-manova.pairwise<-pairwise(manova.w.spec,groups=species)
+manova.pairwise<-pairwise(manova,groups=species)
 summary(manova.pairwise)
 
 # Fenograma (árvore de distância morfológica), distância de Procrustes, agrupamento
@@ -1234,16 +926,19 @@ summary(fit.size) ### Resultado geral
 fit.size <- procD.lm(gpa$coords~log(gpa$Csize)*Fac, data = gdf, iter = 999)
 summary(fit.size) ### Resultado considerando os diferentes slopes
 
+fit.size <- procD.lm(gpa$coords~log(gpa$Csize)*Sex, data = gdf, iter = 999)
+summary(fit.size) ### Resultado considerando os diferentes slopes
+
 plotAllometry(fit.size, 
               size = gpa$Csize, 
               logsz = TRUE, 
-              method = "PredLine", 
+              method = "RegScore", 
               pch = as.numeric(pch), bg = cores_fac, 
               cex = 4, 
               col = cores_fac)
 
 
-legend("bottomright", legend = unique(biome), pch = unique(as.numeric(biome) + 22),title = "Biomes", cex = 2, col = "black")
+legend("bottomright", legend = unique(fac), pch = unique(as.numeric(fac) + 22),title = "Biomes", cex = 2, col = "black")
 
 # Size-Shape PCA
 
@@ -1280,7 +975,7 @@ gdf <- geomorph.data.frame(Shape = gpa$coords, Size = as.numeric(log(gpa$Csize))
 fit.common <- procD.lm(gpa$coords ~ log(gpa$Csize)*species, data = gdf, print.progress = FALSE)
 summary (fit.common)
 
-fit.null <- procD.lm(gpa$coords ~ log(gpa$Csize)+ Sex, data = gdf, print.progress = FALSE)
+fit.null <- procD.lm(gpa$coords ~ log(gpa$Csize) + Sex, data = gdf, print.progress = FALSE)
 summary(fit.null)
 
 PW <- pairwise(fit.common,fit.null, group = species, print.progress = FALSE)
@@ -1983,6 +1678,282 @@ plotRefToTarget(mshape(P$A2), preds$min, outline = Sapajusoutline$outline,gridPa
 plotRefToTarget(mshape(P$A2), preds$max, outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 2)
 par(mfrow=c(1,1))
 dev.off()
+
+########################## Phylo Analisys #########################
+
+# Métodos Filogenéticos Comparativos
+# Carregar arquivo tps da mandíbula
+tps<-readland.tps("Datasets/tps/avglocsex.tps",specID = "ID", readcurves = FALSE)
+gpa<-gpagen(tps)
+shape<-gpa$coords
+size<-gpa$Csize
+ref.mand<-mshape(shape)
+
+shape.2d<-two.d.array(shape)
+shape.2d <- as.matrix(shape.2d,ncol(32))
+
+# Carregar classificadores a partir de lista externa
+plan<-read.csv("Planilhas/avglocsex.csv",sep=";")
+fac <- as.factor(plan$fac)
+species <- as.factor(plan$sp)
+names <- plan$sp_ives
+sexis <- as.factor(plan$sex)
+
+names(fac) <- names
+names(species) <- names
+names(sexis) <- names
+
+###### Minha análise filogenética pra vários spécimes #####
+# Carregar árvore filogen?tica no formato nexus
+tree<-read.tree("Datasets/trees/AVGLOCSEX_Lima.tre")
+plot(tree, cex = 0.5)
+tree<-compute.brlen(tree,1) # definir comprimento dos ramos = 1
+
+# Plotar Filogenia no espaço de forma (phylomorphoespace)
+
+tree$tip.label
+
+dimnames(shape.2d)[[1]] <- paste(names)
+
+pms <- gm.prcomp(shape.2d,phy=tree)
+pms
+plot(pms,phylo=TRUE)
+
+# PCA filogenética
+pPCA_BM<-phyl.pca(tree,pms$x[,1:16],method="BM")
+pPCA_BM
+phylomorphospace(tree,pPCA_BM$S[,1:2],label="horizontal")
+
+pPCA_L<-phyl.pca(tree,pms$x[,1:16],method="lambda")
+pPCA_L
+phylomorphospace(tree,pPCA_L$S[,1:2],label="horizontal")
+
+GP <- gridPar(n.col.cell = 100, pt.bg = "gray", pt.size = 0.8, tar.pt.bg = "cyan", 
+              tar.pt.size = 0.8,tar.out.col = "gray10", tar.out.cex = 0.5, 
+              grid.col = "white", grid.lwd = 0.5,txt.pos = 1, txt.col = "steelblue") ## grids personalizados
+
+plot(tree)
+nodelabels()
+
+sinal.k<-physignal(shape.2d,tree,iter=999)
+sinal.k
+physignal.z(shape.2d, tree)
+
+# Sinal Filogenético para tamanho do crânio
+names(size)<-names
+sinal.k.size<-physignal(size,tree,iter=999)
+sinal.k.size
+
+# Valor observado de K
+K_obs <- sinal.k.size$phy.signal
+
+# Permutações (nula)
+K_null <- sinal.k.size$random.K
+
+# Effect size como Z-score
+effect_size <- (K_obs - mean(K_null)) / sd(K_null)
+effect_size
+library(phytools)
+
+# lnCS é um vetor nomeado com os nomes das espécies
+lambda_result <- phylosig(tree, size, method = "lambda", test = TRUE)
+print(lambda_result)
+
+### com esses códigos da pra fazer análises entre espécies (médias), mas como o meu foco era a análise entre ambientes considerando toda a variação, não foquei nisso
+
+fac <- as.factor(plan$fac)
+names(fac)<-names
+
+fit<-procD.lm(shape.2d ~ fac, iter = 999)
+summary(fit)
+
+# Execute o modelo (forma como resposta, grupo como preditor)
+
+fit <- procD.pgls(shape.2d ~ Fac, phy = tree, data=gdf,iter = 999) 
+summary(fit) # as politomias entre os grupos são muito próximas, o controle filogenético pode estar "apagando" qualquer diferença na forma entre eles.
+
+fit <- procD.pgls(shape.2d ~ Size*Fac, phy = tree, data=gdf, iter = 999) 
+summary(fit)
+
+dimnames(gdf$Shape)[[3]] <- paste (names)
+
+fitl1 <- procD.pgls(Shape~log(Size)*Biome, data = gdf, , phy = tree, iter = 999) 
+fitl2 <- procD.pgls(Shape~log(Size)*Species, data = gdf, , phy = tree, iter = 999) 
+fitl3 <- procD.pgls(Shape~log(Size)*Fac, data = gdf, , phy = tree, iter = 999)
+fitl4 <- procD.pgls(Shape~log(Size)*Sex, data = gdf, , phy = tree, iter = 999)
+fitl5 <- procD.pgls(Shape~log(Size)*Sex*Biome, data = gdf, , phy = tree, iter = 999)
+
+summary(fitl1)
+summary(fitl2)
+summary(fitl3)
+summary(fitl4)
+summary(fitl5)
+
+### ANOVA Filogenética - Essa parte do script não está muito correta
+dim(shape)  # Verifique o número de linhas e colunas de shape
+length(names)  # Verifique o comprimento de names
+formula <- (size~Fac)
+names(Fac) <- names
+
+library(nlme)
+library(ape)
+
+# Matriz de covariância filogenética
+C <- vcv(tree, corr = TRUE)
+
+# Ajustar modelo GLS multivariado com essa matriz
+model <- gls(cbind(main_components) ~ Fac, correlation = corSymm(value = C[lower.tri(C)], fixed = TRUE))
+summary(model)
+
+
+###### PGLS de acordo com o R. Maestri
+########################################################################
+# Calcular forma média por grupos
+shape.2d<-two.d.array(gpa$coords)
+shape.2d.means<-rowsum(shape.2d,species)/as.vector(table(species))
+shape.means<-arrayspecs(shape.2d.means,dim(gpa$coords)[1],dim(gpa$coords)[2]) #arrayspecs transforma matriz em tps
+shape.means
+
+size.means<-rowsum(size,species)/as.vector(table(species))
+size.means <- log(size.means)
+
+# Carregar árvore filogen?tica no formato nexus
+tree<-read.tree("Datasets/trees/MCC_Lima_calibrated.tre")
+plot(tree)
+tree<- drop.tip(tree,c("Sapajus_macrocephalus","Sapajus_flavius" ,"Cebus_albifrons", "Cebus_capucinus"))
+tree<-compute.brlen(tree,1) # definir comprimento dos ramos = 1
+
+# Plotar Filogenia no espaço de forma (phylomorphoespace)
+# pms<-plotGMPhyloMorphoSpace(tree,shape.means,plot.param=list(t.bg="green",txt.col="black",n.bg="black",n.cex=1,lwd=2,l.col="blue")) #não funciona mais
+pms <- gm.prcomp(shape.means,phy=tree)
+pms
+plot(pms,phylo=TRUE)
+
+# 3d
+pca<-gm.prcomp(shape.means)
+phylomorphospace(tree,pms$x[,1:2])
+phylomorphospace3d(tree,pms$x[,1:3])
+
+# PCA filogenética
+pPCA_BM<-phyl.pca(tree,pms$x[,1:5],method="BM")
+pPCA_BM
+phylomorphospace(tree,pPCA_BM$S[,1:2],label="horizontal")
+
+pPCA_L<-phyl.pca(tree,pca$x[,1:5],method="lambda")
+pPCA_L
+phylomorphospace(tree,pPCA_L$S[,1:2],label="horizontal")
+
+GP <- gridPar(n.col.cell = 100, pt.bg = "gray", pt.size = 0.8, tar.pt.bg = "cyan", 
+              tar.pt.size = 0.8,tar.out.col = "gray10", tar.out.cex = 0.5, 
+              grid.col = "white", grid.lwd = 0.5,txt.pos = 1, txt.col = "steelblue") ## grids personalizados
+
+plot(tree)
+nodelabels()
+
+# Visualização das formas ancestrais # n1 = raiz # 1st forma em cinza, 2nd em preto
+ancestral.shapes<-arrayspecs(pms$ancestors,18,2)
+ancestral.shapes
+mshp <- mshape(shape.means)
+par(mfrow = c(1, 1))
+plotRefToTarget(mshp,ancestral.shapes[,,1],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 4)
+plotRefToTarget(ancestral.shapes[,,1],ancestral.shapes[,,2],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 4)
+plotRefToTarget(ancestral.shapes[,,1],ancestral.shapes[,,3],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 4)
+plotRefToTarget(ancestral.shapes[,,1],ancestral.shapes[,,4],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 4)
+plotRefToTarget(ancestral.shapes[,,1],ancestral.shapes[,,5],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 4)
+
+par(mfrow = c(2, 3))
+plotRefToTarget(ancestral.shapes[,,1],shape.means[,,"Sapajus_xanthosternos"],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 3)
+plotRefToTarget(ancestral.shapes[,,1],shape.means[,,"Sapajus_robustus"],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 3)
+plotRefToTarget(ancestral.shapes[,,1],shape.means[,,"Sapajus_nigritus"],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 3)
+plotRefToTarget(ancestral.shapes[,,1],shape.means[,,"Sapajus_libidinosus"],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 3)
+plotRefToTarget(ancestral.shapes[,,1],shape.means[,,"Sapajus_cay"],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 3)
+plotRefToTarget(ancestral.shapes[,,1],shape.means[,,"Sapajus_apella"],method="points", outline = Sapajusoutline$outline, gridPars=GP, mag = 3)
+
+# Sinal Filogenético para forma do crânio
+sinal.k<-physignal(shape.means,tree,iter=999)
+sinal.k
+physignal.z(shape.means,tree)
+
+# Sinal Filogenético para tamanho do crânio
+size.means<-rowsum(size,species)/as.vector(table(species)) # m?dia por esp?cie
+sinal.k.size<-physignal(size.means,tree,iter=999)
+sinal.k.size
+
+# Visualizar tamanho na filogenia
+size.means1<-as.vector(size.means)
+names(size.means1)=rownames(size.means)
+tree1<-compute.brlen(tree,method="Grafen") # make ultrametric
+# cores
+contMap(tree1,size.means1)
+
+# Phylogenetic Generalized Least Squares (PGLS) 
+
+# Variáveis hipotéticas para usar como exemplo
+
+nomes<-levels(as.factor(plan$sp))
+temp<-as.numeric(plan$bio1)
+prec<-as.numeric(plan$bio12)
+bio.means <- c("Sapajus_xanthosternos"="Forest","Sapajus_robustus"="Forest","Sapajus_nigritus"="Forest",
+               "Sapajus_libidinosus"="Savanna","Sapajus_cay"="Savanna","Sapajus_apella"="Forest")
+temp.means<-scale(rowsum(temp,species)/as.vector(table(species)))
+prec.means<-scale(rowsum(prec,species)/as.vector(table(species)))
+spec <- levels(as.factor(plan$sp))
+names(temp.means)<-nomes
+names(prec.means)<-nomes
+names(bio.means)<-nomes
+names(spec) <- nomes
+
+# PGLS
+gdf.m<-geomorph.data.frame(Shape=shape.means,Size=size.means,Species = spec,Temp=temp.means,Prec=prec.means,Biome=bio.means,tree=tree)
+dimnames(gdf.m$Shape)[[3]] <- paste (nomes)
+
+fitl1 <- procD.lm(Shape~Size*Biome, data = gdf.m, iter = 999) 
+fitl2 <- procD.lm(Shape~Species, data = gdf.m, iter = 999) 
+
+summary(fitl1)
+summary(fitl2)
+
+fitl1 <- procD.pgls(Shape~log(Size)*Biome, data = gdf.m, phy = tree, iter = 999) 
+fitl2 <- procD.pgls(Shape~log(Size)*Species, data = gdf.m, phy = tree, iter = 999) 
+
+summary(fitl1)
+summary(fitl2)
+
+p<-procD.lm(shape.means~size.means*prec,data=gdf.m)
+summary(p)
+
+pgls.shape<-procD.pgls(shape.means~size.means*prec,tree,data=gdf.m,iter=999) #inclui a árvore filogenética #procrustes
+summary(pgls.shape)
+
+# Plot
+p.plot<-
+  plot(pgls.shape,type="regression",predictor=as.numeric(prec.means),reg.type="RegScore",xlab="Precipitation")
+reg.score<-as.vector(p.plot$RegScore)
+names(reg.score)=rownames(p.plot$RegScore)
+phylomorphospace(tree,cbind(prec.means,reg.score))
+
+# Variação de forma associada
+preds <- shape.predictor(shape.means, x = prec.means, Intercept = TRUE,
+                         predmin = min(prec.means),
+                         predmax = max(prec.means))
+
+plotRefToTarget(preds$predmin,preds$predmax,method = "points", outline = Sapajusoutline$outline, gridPars=GP, mag = 2)
+
+# PGLS size
+pgls.size<-procD.pgls(size.means~temp.means,tree,data=gdf,iter=999)
+summary(pgls.size)
+plot(size.means~temp.means)
+
+pgls.biome <- procD.pgls(shape.means~bio.means,tree,data=gdf,iter=999)
+summary(pgls.biome)
+
+### ANOVA Filogenética - Essa parte do script não está muito correta, não funciona
+sz <- as.matrix(size.means, ncol(1))
+grp <- as.factor(bio.means)
+names(grp)=nomes
+names(sz)=nomes
+
+x = aov.phylo(sz~grp,tree, nsim=999, test="Pillai")
 
 
 ### Aqui estão códigos para salvar os dados originais de diferentes formas
