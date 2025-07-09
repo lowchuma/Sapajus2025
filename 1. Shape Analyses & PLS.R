@@ -923,21 +923,22 @@ gdf <- geomorph.data.frame(Shape = gpa$coords, Size = gpa$Csize,Species = specie
 fit.size <- procD.lm(gpa$coords~log(gpa$Csize), data = gdf, iter = 999)
 summary(fit.size) ### Resultado geral
 
-fit.size <- procD.lm(gpa$coords~log(gpa$Csize)*Fac, data = gdf, iter = 999)
+fit.size <- procD.lm(gpa$coords~log(gpa$Csize)*Sex*Fac, 
+                     data = gdf, iter = 999)
 summary(fit.size) ### Resultado considerando os diferentes slopes
 
-fit.size <- procD.lm(gpa$coords~log(gpa$Csize)*Sex, data = gdf, iter = 999)
+fit.size <- procD.lm(gpa$coords~log(gpa$Csize), data = gdf, iter = 999)
 summary(fit.size) ### Resultado considerando os diferentes slopes
 
 plotAllometry(fit.size, 
               size = gpa$Csize, 
               logsz = TRUE, 
-              method = "RegScore", 
+              method = "PredLine", 
               pch = as.numeric(pch), bg = cores_fac, 
-              cex = 4, 
+              cex = 3, 
               col = cores_fac)
 
-
+fac <- as.factor(fatores$fac)
 legend("bottomright", legend = unique(fac), pch = unique(as.numeric(fac) + 22),title = "Biomes", cex = 2, col = "black")
 
 # Size-Shape PCA
@@ -1048,11 +1049,7 @@ dim(adj.shape)
 #shapes--somar a média retorna os números para o espaço de forma original e permite
 #visualização de mudanças de forma
 
-gdf <- geomorph.data.frame(Shape = adj.shape, Species = spec, Biome = biome, 
-                           Size = log(gpa$Csize), Sex = sex)
-
-
-gdf$residuals <- adj.shape
+gdf <- geomorph.data.frame(Shape = adj.shape, Species = factor(fatores$sp), Biome = biome, Size = log(gpa$Csize), Sex = sex)
 
 pca_res <- gm.prcomp(adj.shape) ## forma dos resíduos alométricos
 summary(pca_res)
@@ -1201,6 +1198,9 @@ predsPC3 <- shape.predictor(gpa$coords, scorespc3, Intercept = TRUE, predmin = m
 plotRefToTarget(mshape, predsPC3$predmin, mag = 2, outline = Sapajusoutline$outline,gridPars = GP,  method = "points") #shape related to small pc scores
 plotRefToTarget(mshape, predsPC3$predmax, mag = 2, outline = Sapajusoutline$outline,gridPars = GP,  method = "points")#shape related to large pc scores
 
+fit_allo_free <- procD.lm(adj.shape~fac*sex, data = gdf)
+summary(fit_allo_free)
+
 par(mfrow=c(1,1))
 
 dev.off()
@@ -1249,10 +1249,10 @@ M_adj.shape<-shape.resid+array(M_gpa$consensus, dim(shape.resid)) # allometry-fr
 
 M_residuals <- M_adj.shape
 
-M_fit_bio <- procD.lm(M_gpa$coords~log(M_gpa$Csize)*Biome_M, iter = 9999)
-summary(M_fit_bio)
+M_fit_bio <- procD.lm(M_gpa$coords~log(M_gpa$Csize)*Fac_M, iter = 9999)
+summary(M_fit_bio) # Sem interação
 
-M_fit_bio <- procD.lm(M_residuals~Biome_M, iter = 9999)
+M_fit_bio <- procD.lm(M_residuals~Fac_M, iter = 9999)
 summary(M_fit_bio)
 
 M_pca_res <- gm.prcomp(M_residuals)
@@ -1267,9 +1267,9 @@ plotAllometry(M_fit_bio,
               size = log(M_gpa$Csize), 
               logsz = FALSE, 
               method = "PredLine", 
-              pch = c(15,18)[as.numeric(as.factor(Biome_M))], 
+              pch = c(18,19,25)[as.numeric(as.factor(Fac_M))], 
               cex = 2, 
-              col = c("green3", "goldenrod")[as.numeric(as.factor(Biome_M))])
+              col = c("darkgreen","green3", "goldenrod")[as.numeric(as.factor(Fac_M))])
 
 legend("bottomright",  legend = unique(Biome_M), pch = 16, title = "Biome", cex = 1.2, col = c("green3", "goldenrod")[unique(as.factor(Biome_M))])
 
@@ -1311,10 +1311,10 @@ F_adj.shape<-shape.resid+array(F_gpa$consensus, dim(shape.resid)) # allometry-fr
 
 F_residuals <- F_adj.shape
 
-F_fit_bio <- procD.lm(F_gpa$coords~log(F_gpa$Csize)*Biome_F, iter = 9999)
+F_fit_bio <- procD.lm(F_gpa$coords~log(F_gpa$Csize)*Fac_F, iter = 9999)
 summary(F_fit_bio)
 
-F_fit_bio <- procD.lm(F_residuals~Biome_F, iter = 9999)
+F_fit_bio <- procD.lm(F_residuals~Fac_F, iter = 999)
 summary(F_fit_bio)
 
 F_pca_res <- gm.prcomp(F_residuals)
@@ -1400,6 +1400,11 @@ for (i in biomes) {
 
 par(mfrow = c(1,1))
 
+summary(M_fit_bio)
+summary(F_fit_bio)
+
+machos_femeas <- pairwise(fit_allo_free, groups=sex)
+summary(machos_femeas)
 
 ################################### Climatic Variables - AVGLOCSEX ########################
 
