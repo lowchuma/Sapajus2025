@@ -486,157 +486,144 @@ plot(pca_data$Size, PC3,
 ####################################### CVA ############################################
 
 
-if (require(shapes)) {
-  alldat<-gpa$coords
-  # create factors
-  groups<-as.factor(fatores$fac)
-  # perform CVA and test Mahalanobis distance
-  # between groups with permutation test by 100 rounds)            
-  cvall<-CVA(alldat,groups,rounds=10000)     
-  ## visualize a shape change from score -5 to 5:
-  cvvis5 <- 5*matrix(cvall$CVvis[,1],nrow(cvall$Grandm),ncol(cvall$Grandm))+cvall$Grandm
-  cvvisNeg5 <- -5*matrix(cvall$CVvis[,1],nrow(cvall$Grandm),ncol(cvall$Grandm))+cvall$Grandm
-  plot(cvvis5,asp=1,pch = 21, bg = "black")
-  points(cvvisNeg5,col=2, pch = 25, cex = 2, bg = "red")
-  for (i in 1:nrow(cvvisNeg5))
-    lines(rbind(cvvis5[i,],cvvisNeg5[i,]))
+# Load required packages
+library(shapes)
+library(geomorph)
+library(car) # For dataEllipse
+
+#================================================================
+# 1. DATA PREPARATION
+#================================================================
+# This script assumes you have:
+# - 'gpa': An object from geomorph::gpagen() containing Procrustes coordinates and Centroid Size.
+# - 'Fac': A factor variable with group assignments (e.g., ecoregions) for each specimen.
+# - 'cores_fac': A named vector of colors for your groups.
+# - 'mshape': The mean shape, likely from gpa$consensus.
+# - 'Sapajusoutline': An outline object for plotting shape changes.
+
+# Calculate allometry-free shapes (residuals from a regression of shape on size)
+allometry_model <- procD.lm(gpa$coords ~ log(gpa$Csize), iter = 999, RRPP = TRUE)
+shape_residuals <- arrayspecs(allometry_model$residuals, p = dim(gpa$coords)[1], k = dim(gpa$coords)[2])
+allometry_free_shape <- shape_residuals + array(gpa$consensus, dim(shape_residuals))
+
+
+#================================================================
+# 2. CANONICAL VARIATE ANALYSIS (CVA)
+#================================================================
+
+# Perform CVA on the allometry-free shape data
+# Permutation test (10,000 rounds) assesses significance of group separation
+cva_results <- CVA(allometry_free_shape, group = Fac, rounds = 10000, cv = TRUE)
+print(cva_results)
+
+dist_matrix <- cva_results$Dist$GroupdistMaha
+pval_matrix <- cva_results$Dist$probsMaha
+
+group_names <- levels(Fac)
+
+results_table <- data.frame(
+  Comparison = combn(group_names, 2, paste, collapse = " - "),
+  Mahalanobis_Distance = as.vector(dist_matrix),
+  p_value = as.vector(pval_matrix)
+)
+
+results_table$Mahalanobis_Distance <- round(results_table$Mahalanobis_Distance, 2)
+
+cat("\n#################################################\n")
+cat("--- PAIRWISE DISTANCES AND P-VALUES ---\n")
+cat("#################################################\n")
+print(results_table)
+
+#================================================================
+# CVA PLOT
+#================================================================
+
+# Set up plot parameters
+par(mar = c(5, 5, 2, 2), pty = "s") # Set margins and square plot area
+
+# Create the main plot of CVA scores
+plot(cva_results$CVscores,
+     asp = 1,
+     pch = 21,
+     bg = cores_fac,
+     col = "black",
+     cex = 2.5,
+     xlab = paste0("Canonical Variate 1 (", round(cva_results$Var[1, 2], 1), "%)"),
+     ylab = paste0("Canonical Variate 2 (", round(cva_results$Var[2, 2], 1), ")"),
+     cex.lab = 1.2,
+     cex.axis = 1.1
+)
+
+# Add 95% confidence ellipses for each group
+for (i in 1:length(levels(Fac))) {
+  dataEllipse(cva_results$CVscores[Fac == levels(Fac)[i], 1],
+              cva_results$CVscores[Fac == levels(Fac)[i], 2],
+              add = TRUE,
+              levels = 0.95,
+              col = cores_fac[levels(Fac)[i]],
+              lwd = 2,
+              plot.points = FALSE
+  )
 }
 
-cva.1=CVA(gpa$coords, groups=Fac)
+# Add a legend
+legend("topleft",
+       legend = levels(Fac),
+       pch = 21,
+       pt.bg = cores_fac[levels(Fac)],
+       pt.cex = 2,
+       cex = 1.1,
+       bty = "n"
+)
 
-## get the typicality probabilities and resulting classifications - tagging
-## all specimens with a probability of < 0.01 as outliers (assigned to no class)
 
-typprobs <- typprobClass(cva.1$CVscores,groups=Fac)
-print(typprobs)
+#================================================================
+# 4. SUPPLEMENTARY VISUALIZATIONS
+#================================================================
 
-## visualize the CV scores by their groups estimated from (cross-validated)
-## typicality probabilities:
-ffinCV <- as.factor(typprobs$groupaffinCV)
+# Reset plot layout
+par(mfrow = c(1, 1), mar = c(5, 4, 4, 2))
 
-levels_ffinCV <- unique(typprobs$groupaffinCV)
+# --- Dendrogram of Mahalanobis Distances ---
+maha_dist <- hclust(cva_results$Dist$GroupdistMaha)
+maha_dist$labels <- levels(Fac)
+plot(as.dendrogram(maha_dist),
+     ylab = "Mahalanobis Distance",
+     xlab = "Ecoregion Groups",
+     main = "Morphological Distance Between Groups"
+)
 
-cores_CVA <- c(AF = "green3", AM = "darkgreen", SV = "goldenrod1")
+# --- Visualize Shape Changes Along CV Axes ---
+# Get shape configurations at the extremes of the first two CV axes
 
-if (require(car)) {
-  scatterplot(cva.1$CVscores[,1],cva.1$CVscores[,2],groups=typprobs$groupaffinCV, pch = c(21,22,25) ,col = unique(cores_CVA), cex = 4, bg = unique(cores_CVA))
-}
-text(cva.1$CVscores, as.character(ffinCV), col = "black", cex = 0.5)
+cv1_min_shape <- min(cva_results$CVscores[, 1]) * matrix(cva_results$CVvis[, 1], nrow(mshape), ncol(mshape)) + mshape
+cv1_max_shape <- max(cva_results$CVscores[, 1]) * matrix(cva_results$CVvis[, 1], nrow(mshape), ncol(mshape)) + mshape
+cv2_min_shape <- min(cva_results$CVscores[, 2]) * matrix(cva_results$CVvis[, 2], nrow(mshape), ncol(mshape)) + mshape
+cv2_max_shape <- max(cva_results$CVscores[, 2]) * matrix(cva_results$CVvis[, 2], nrow(mshape), ncol(mshape)) + mshape
 
-cva.1$CVscores[,1]
+# Plot the shape changes (requires 'geomorph' and a predefined outline)
+# Example for CV1: shows the change from the negative to the positive end of the axis
+par(mfrow = c(1, 2), mar = c(0, 0, 0, 0))
 
-# plot the CVA
-plot(cva.1$CVscores, pch = 21, bg = cores_fac, col= cores_fac, asp=1, cex = 3,
-     xlab=paste("1st canonical axis", paste(round(cva.1$Var[1,2],1),"%")),
-     ylab=paste("2nd canonical axis", paste(round(cva.1$Var[2,2],1),"%")))
-
-text(cva.1$CVscores, as.character(Fac), col = "black", cex=.7)
-
-# add chull (merge groups)
-for(jj in 1:length(levels(Fac))){
-  ii=levels(Fac)[jj]
-  kk=chull(cva.1$CVscores[Fac==ii,1:2])
-  lines(cva.1$CVscores[Fac==ii,1][c(kk, kk[1])],
-        cva.1$CVscores[Fac==ii,2][c(kk, kk[1])], col = (1:3))
-}
-
-# add 80% ellipses
-if (require(car)) {
-  for(ii in 1:length(levels(Fac))){
-    dataEllipse(cva.1$CVscores[Fac==levels(Fac)[ii],1],
-                cva.1$CVscores[Fac==levels(Fac)[ii],2], 
-                add=TRUE,levels=.95, col=unique(cores_CVA)[ii])}
-}
-# histogram per group
-if (require(lattice)) {
-  histogram(~cva.1$CVscores[,1]|Fac,
-            layout=c(1,length(levels(Fac))),
-            xlab=paste("1st canonical axis", paste(round(cva.1$Var[1,2],1),"%")))
-  histogram(~cva.1$CVscores[,2]|Fac, layout=c(1,length(levels(Fac))),
-            xlab=paste("2nd canonical axis", paste(round(cva.1$Var[2,2],1),"%")))
-} 
-# plot Mahalahobis
-dendroS=hclust(cva.1$Dist$GroupdistMaha)
-dendroS$labels=levels(Fac)
-par(mar=c(4,4.5,1,1))
-dendroS=as.dendrogram(dendroS)
-plot(dendroS, main='',sub='', xlab="Ecoregions",
-     ylab='Mahalahobis distance')
-
-fac <- Fac
-col.group<-rainbow(length(levels(Fac))) # criar vetor de cores para grupos
-names(col.group)<-levels(Fac)
-col.group<-col.group[match(Fac,names(col.group))]
-
-PCA
-
-cva<-CVA(PCA$x[,1:32],groups = Fac,cv=TRUE) # Jackknife Cross-validation
-cva
-plot(cva$CVscores, col = cores_fac, cex = 3)
-
-cva<-CVA(gpa$coords,groups = Fac,cv=FALSE) # CVA validation 
-cva
-plot(cva$CVscores, col = cores_fac, pch = 21, bg = cores_fac, cex = 3)
-
-# LDA (Linear Discriminant Analysis) #2 alternativa com apenas dois grupos
-
-cva2<-lda(PCA$x[,1:32],biome)
-plot(cva2)
-
-cva2<-lda(PCA$x[,1:32],biome,CV=T) #LDA com Jackknife cross validation
-plot(cva2$posterior, col = unique(cores_fac), pch = 21, bg = unique(cores_fac), cex = 1)
-
-tab<-table(biome,cva2$class) 
-lda.p<-diag(tab)/summary(biome)*100
-lda.p # proporção de classificação correta para cada grupo
-
-# CVA (Canonical Variate Analysis)
-cva$Var # Porcentagem de explica??o dos eixos da CVA
-plot(cva$CVscores,col = col.group,bg=col.group,pch=21,cex=2,xlab=paste("CV1  (",paste(round(cva$Var[1,2],1),"%)"),sep=""),ylab=paste("CV2  (",paste(round(cva$Var[2,2],1),"%)"),sep=""))
-legend("topleft",legend=unique(fac),pch=19,col=unique(col.group)) 
-
-# gera elipses de confiançaa 95%
-ordiellipse(cva$CVscores,group=fac, kind="sd", conf=0.95) 
-ordihull(cva$CVscores,group=fac)
-
-# Visualização da forma nos eixos da CVA
-cv1max<-max(cva$CVscores[,1])*matrix(cva$CVvis[,1],nrow(cva$Grandm),ncol(cva$Grandm))+cva$Grandm
-cv1min<-min(cva$CVscores[,1])*matrix(cva$CVvis[,1],nrow(cva$Grandm),ncol(cva$Grandm))+cva$Grandm
-cv2max<-max(cva$CVscores[,2])*matrix(cva$CVvis[,2],nrow(cva$Grandm),ncol(cva$Grandm))+cva$Grandm
-cv2min<-min(cva$CVscores[,2])*matrix(cva$CVvis[,2],nrow(cva$Grandm),ncol(cva$Grandm))+cva$Grandm
-
-plotRefToTarget(cv1min,cv1max,outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 1.5) 
-plotRefToTarget(mshape,cv1min,outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 1.5)  
-plotRefToTarget(mshape,cv2max,outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 1.5) 
-plotRefToTarget(mshape,cv2min,outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 1.5) 
-
-# CVA Estilizada
-mat<-matrix(c(4,5,0,1,1,2,1,1,3),3) # Dividir a janela do plot
-layout(mat, widths=c(1,1,1), heights=c(1,1,0.6))
-par(mar=c(4, 4, 1, 1))
-plot(cva$CVscores,bg=col.group,pch=21,cex=2,xlab=paste("CV1  (",paste(round(cva$Var[1,2],1),"%)"),sep=""),ylab=paste("CV2  (",paste(round(cva$Var[2,2],1),"%)"),sep=""))
-legend(+3,+3,legend=unique(Fac),pch=19,col=unique(col.group))
-ordiellipse(cva$CVscores,group=fac, kind="sd", conf=0.95) 
-
-plotRefToTarget(mshape,cv1min,outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 2) 
-plotRefToTarget(mshape,cv1max,outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 2)  
-plotRefToTarget(mshape,cv2max,outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 2) 
-plotRefToTarget(mshape,cv2min,outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 2) 
-par(mfrow=c(1,1))
+plotRefToTarget(cv1_min_shape, cv1_max_shape, 
+                outline = Sapajusoutline$outline, method = "points", mag = 2, gridPars = GP)
+plotRefToTarget(cv2_min_shape, cv2_max_shape, 
+                outline = Sapajusoutline$outline, method = "points", mag = 2, gridPars = GP)
 
 ### CVA Corrigida ###
 layout(matrix(c(4,5,0,1,1,2,1,1,3), 3), widths=c(1,1,1), heights=c(1,1,0.6))
 par(mar=c(4, 4, 1, 1))
 
-plot(
-  cva$CVscores,
-  bg = cores_fac[as.character(Fac)],
-  pch = 21,
-  cex = 4,
-  xlab = paste("CV1  (", round(cva$Var[1,2], 1), "%)", sep = ""),
-  ylab = paste("CV2  (", round(cva$Var[2,2], 1), "%)", sep = ""),
-  col = cores_fac[as.character(Fac)],
-  lwd = 2
+plot(cva_results$CVscores,
+     asp = 1,
+     pch = 21,
+     bg = cores_fac,
+     col = "black",
+     cex = 2.5,
+     xlab = paste0("Canonical Variate 1 (", round(cva_results$Var[1, 2], 1), "%)"),
+     ylab = paste0("Canonical Variate 2 (", round(cva_results$Var[2, 2], 1), ")"),
+     cex.lab = 1.2,
+     cex.axis = 1.1
 )
 
 legend(+2.5,+3,legend=unique(Fac),pch=19,col=unique(cores_fac),title = "Ecoregions",
@@ -660,38 +647,58 @@ text(
   col = "black"
 )
 
-plotRefToTarget(mshape,cv1min,outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 2) 
-plotRefToTarget(mshape,cv1max,outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 2)  
-plotRefToTarget(mshape,cv2max,outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 2) 
-plotRefToTarget(mshape,cv2min,outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 2) 
+plotRefToTarget(mshape,cv1_min_shape,outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 2) 
+plotRefToTarget(mshape,cv1_max_shape,outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 2)  
+plotRefToTarget(mshape,cv2_min_shape,outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 2) 
+plotRefToTarget(mshape,cv2_max_shape,outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 2) 
 par(mfrow=c(1,1))
 
-# Comparação das formas médias dos grupos entre si # 1 = cinza, 2 = preto # Exemplos:
-par(mfrow=c(2,2))
 
-plotRefToTarget(cva$groupmeans[,,"SV"],cva$groupmeans[,,"AM"],outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 3)
-plotRefToTarget(cva$groupmeans[,,"AM"],cva$groupmeans[,,"SV"],outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 3)
-plotRefToTarget(cva$groupmeans[,,"SV"],cva$groupmeans[,,"AF"],outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 3)
-plotRefToTarget(cva$groupmeans[,,"AF"],cva$groupmeans[,,"SV"],outline = Sapajusoutline$outline,gridPars = GP,  method = "points", mag = 3)
+GP <- gridPar(
+  pt.size = 0.8,
+  pt.bg = "black",
+  link.col = "darkgray",
+  link.lwd = 1.5,
+  out.col = "black",
+  out.lwd = 2,
+  tar.pt.bg = "black",
+  tar.pt.size = 1,
+  ref.pt.bg = "gray",
+  ref.pt.size = 0.8
+)
+GP
+# --- 2. Set up a 1x2 Plot Layout for side-by-side comparison ---
+par(mfrow = c(1, 2), mar = c(1, 1, 2, 1))
+
+# --- 3. Generate the Deformation Plots ---
+
+# Plot 1: Savanna (Reference) vs. Amazon Forest (Target)
+plotRefToTarget(
+  cva_results$groupmeans[, , "SV"], # Reference shape
+  cva_results$groupmeans[, , "AM"], # Target shape
+  outline = Sapajusoutline$outline,
+  gridPars = GP,
+  method = "points",
+  mag = 2
+)
+title("Savanna to Amazon Forest", cex.main = 1.5)
+
+# Plot 2: Savanna (Reference) vs. Atlantic Forest (Target)
+plotRefToTarget(
+  cva_results$groupmeans[, , "SV"], # Reference shape
+  cva_results$groupmeans[, , "AF"], # Target shape
+  outline = Sapajusoutline$outline,
+  gridPars = GP,
+  method = "points",
+  mag = 2
+)
+title("Savanna to Atlantic Forest", cex.main = 1.5)
 
 
-# Plotar o Scree Plot (gráfico que mostra a dispersão da variância acumulada pela PCA)
-par(mfrow=c(1,2))
+# --- 4. Reset Plot Layout to Default ---
+par(mfrow = c(1, 1))
 
-scree_data <- data.frame(Principal_Component = 1:length(PCA$sdev), Variance_Explained = PCA$sdev^2 / sum(PCA$sdev^2))
-
-plot(scree_data$Principal_Component, scree_data$Variance_Explained, type = "b", pch = 19, col = "blue", xlab = "Componente Principal", ylab = "Porcentagem de Variância Explicada", main = "Original")
-
-scree_data <- data.frame(Principal_Component = 1:length(pca_res$sdev), Variance_Explained = pca_res$sdev^2 / sum(pca_res$sdev^2))
-
-plot(scree_data$Principal_Component, scree_data$Variance_Explained, type = "b", pch = 19, col = "red", xlab = "Componente Principal", ylab = "Porcentagem de Variância Explicada", main = "Resíduos Alométricos")
-
-par(mfrow=c(1,1))
-
-dev.off()
-
-### Shapiro - Wilk - Aplicar onde necessário conferir a homogeneidade/normalidade das variáveis (geralmente feito nos resíduos de modelos)
-
+### Shapiro - Wilk 
 size <- gpa$Csize
 head (size)
 
@@ -708,21 +715,31 @@ dev.off()
 
 ####################### Analises de Variância Univariadas Qualitativas 
 
-df <- data.frame(Species = species, Latitude = latitude, Biome = biome, Envi = Fac, Size = size, Sex = sex)
+df <- data.frame(Species = species, Latitude = latitude, Biome = biome, Envi = factor(fatores$fac), Size = log(gpa$Csize), Sex = sex)
 
 aov_res <- aov(Size~Species, data = df)
 summary(aov_res)
 TukeyHSD(aov_res)
 
+summary(lm(Size~Species, data = df))
+plot(Size~Species,data=df)
+
 aov_res <- aov(Size~Sex, data = df)
 summary(aov_res)
+summary(lm(Size~Sex, data=df))
 
-aov_res <- aov(Size~Biome, data = df)
-summary(aov_res)
-
+summary(lm(Size~Envi, data=df))
 aov_res <- aov(Size~Envi, data = df)
 summary(aov_res)
 TukeyHSD(aov_res)
+
+ggplot(data=df, aes(x=Envi,y=Size,fill = Envi)) + 
+  geom_violin(trim = FALSE) + 
+  geom_jitter(width = 0.2, pch = 21,color = "black", bg = "cyan", size = 3) +
+  geom_boxplot(width = 0.1, fill = "white", color = "black") +
+  scale_fill_manual(values = cores_fac, labels = c("Amazon","Atlantic Forest", "Savanna")) +
+  labs(x = "Ecoregion", y = "log(CS)", fill = NULL, title = NULL) +
+  theme_minimal()
 
 ### Multivariadas (para forma)
 ## Criar um geomorph dataframe ##
@@ -848,14 +865,21 @@ summary(manova.bio)
 # MANOVA Wilks's lambda #Mais prox de 0 mais diferença entre grupos #Teste parecido com o de p. Para comparar entre os grupos
 
 PCA
-manova.w<-manova(PCA$x[,1:16]~log(size)+biome)
+size <- gpa$Csize
+manova.w<-manova(PCA$x[,1:16]~sex)
 summary(manova.w,test="Wilks")
 
-manova.w<-manova(PCA$x[,1:16]~log(size)+Fac)
+manova.w<-manova(PCA$x[,1:16]~Fac)
+summary(manova.w,test="Wilks")
+
+manova.w<-manova(PCA$x[,1:16]~species)
 summary(manova.w,test="Wilks")
 
 manova.w.sex<-manova(PCA$x[,1:16]~log(size)+sex)
 summary(manova.w.sex,test="Wilks")
+
+manova.w<-manova(PCA$x[,1:16]~log(size)+Fac)
+summary(manova.w,test="Wilks")
 
 manova.w.spec<-manova(PCA$x[,1:16]~log(gpa$Csize)*species)
 summary(manova.w.spec,test="Wilks")
