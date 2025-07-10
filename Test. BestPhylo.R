@@ -1,252 +1,141 @@
-library(ggplot2)
-library(geomorph)
-library(phytools)
-library(vegan)
-library(geiger)
-library(phangorn)
-library(tidyverse)
-library(usdm)
+#################################################################
+# STEP 1 (CORRECTED VERSION): LOAD AND SYNCHRONIZE DATA
+#################################################################
 
-phy1 <-read.tree("Datasets/trees/AVGLOCSEX_Lima.tre")
-phy2 <-read.tree("Datasets/trees/AVGLOCSEX_Wright.tre")
-phy3 <-read.tree("Datasets/trees/AVGLOCSEX_Upham.tre")
-
-library(caper)  # Pacote para rodar o PGLS
-library(devtools)
-#install_github("cran/difconet")
-library(difconet)
-library(car)
-
-
-# Supondo que suas 19 variáveis estejam no data frame 'bio_data' e que as filogenias sejam 'phy1', 'phy2', e 'phy3'
-data <- read.csv("Planilhas/avglocsex.csv", sep = ";")
-response_variable <- as.data.frame(data$CS)
-rownames(response_variable) <-data$sp_ives
-names(data)
-bio_data <- as.data.frame(scale(data[,11:32]))
-CS <- as.numeric(data$CS)
-rownames(bio_data) <-data$sp_ives
-
-## verificar as correlações
-
-M <- cor(bio_data)  # Remove a variável dependente "CS"
-library(corrplot)
-corrplot(M,method = 'circle', col = COL2(n=200), order = 'hclust', hclust.method = 'ward.D2', addrect = 4,tl.srt = 45)
-
-### PCA para reduzir dimensionalidade das variáveis
-
-pca <- prcomp(bio_data, scale. = TRUE)
-summary(pca)
-pca_data <- as.data.frame(pca$x)  # Extrai os scores dos componentes principais
-pca_model <- lm(CS ~., data = cbind(pca_data))
-summary(pca_model)
-step_model <- step(pca_model, direction = "both")
-summary(step_model)
-vif(step_model)
-
-plot(pca_model, pch = as.numeric(data$pch), col = as.factor(data$fac))
-plot(step_model, pch = as.numeric(data$pch), col = as.factor(data$fac))
-
-shapiro.test(pca_model$residuals)
-shapiro.test(step_model$residuals)
-
-plot(
-  pca$x, 
-  xlab = "PC1", 
-  ylab = "PC2", 
-  main = "PCA Environment Plot", 
-  pch = as.numeric(data$pch), 
-  col = c("green3","forestgreen", "goldenrod")[as.factor(data$fac)], cex = 2, bg = "goldenrod"
-)
-text(pca$x, labels = rownames(pca$x), pos = 4, cex = 0.3)
-
-## Regressão linear "lm"
-
-model <- lm(log(CS) ~ ., data=bio_data)
-summary (model)
-step_model <- step(model, direction = "both")
-summary(step_model)
-
-model_reduc <- lm(log(CS) ~ bio4+bio8+bio11+bio12+bio16+bio17, data=bio_data)
-summary(model_reduc)
-vif(model_reduc)
-
-plot(model_reduc, pch = as.numeric(data$pch), col = as.factor(data$fac))
-plot(model_reduc$fitted.values~model_reduc$residuals, pch = as.numeric(data$pch), col = as.factor(data$fac))
-abline(model_reduc)
-shapiro.test(model_reduc$residuals)
-
-# Carregar pacotes necessários
-#install.packages("mpm")
-library(mpmcorrelogram)
-require(car)
-require(AICcmodavg)
-require(reshape2)
-require(ape)
-require(vegan)
-
-# Ajuste do modelo linear múltiplo com as variáveis selecionadas
-fit <- lm(log(CS) ~ bio4+bio8+bio11+bio12+bio16+bio17, data = data)
-vif(fit) # Verificação de multicolinearidade
-
-# Modelos lineares simples para as variáveis selecionadas
-fit1 <- lm(log(CS) ~ bio12, data = data)
-summary(fit1)
-
-fit2 <- lm(log(CS) ~ bio8, data = data)
-summary(fit2)
-
-fit3 <- lm(log(CS) ~ bio17, data = data)
-summary(fit3)
-
-fit4 <- lm(log(CS) ~ bio16, data = data)
-summary(fit4)
-
-
-# Comparação de modelos com AIC
-models <- list(fit1, fit2, fit3, fit4)
-model.names <- c('bio12', 'bio8', 'bio17','bio16')
-aictab(cand.set = models, modnames = model.names)
-
-# Aplicar a função vifstep() para remover automaticamente variáveis com VIF alto
-names(bio_data)
-bioclim <- as.matrix(bio_data)
-
-vifstep_result <- vifstep(bioclim,th = 4, keep = "bio12")
-vifstep_result
-
-# "bio2","bio3","bio8","bio12","bio15","bio18","npp", "soilmoist"
-
-# Ajustar um modelo apenas com as variáveis selecionadas
-selected_vars <- vifstep_result@results$Variables
-model_reduced <- lm(log(CS) ~ ., data = bio_data[, selected_vars])
-summary(model_reduced)
-step_model <- step(model_reduced, direction = "both")
-summary(step_model) #bio8 e bio12
-vif(step_model)
-
-### Após testar com modelos lineares convencionais, é hora de selecionar a PGLS -> Best phylo ################
-
-models_phy1 <- pgls.SEy(CS ~ bio2+bio3+bio8+bio12+bio15+bio18+npp+soilmoist ,data=bio_data,
-                        tree=phy1)
-summary(models_phy1)
-
-models_phy2 <- pgls.SEy(CS ~  bio2+bio3+bio8+bio12+bio15+bio18+npp+soilmoist ,data=bio_data,
-                        tree=phy2)
-summary(models_phy2)
-
-models_phy3 <- pgls.SEy(CS ~  bio2+bio3+bio8+bio12+bio15+bio18+npp+soilmoist ,data=bio_data,
-                        tree=phy3)
-summary(models_phy3)
-
-# Compbio_data# Comparar os valores de AIC
-aic_phy1 <- AIC(models_phy1)
-aic_phy2 <- AIC(models_phy2)
-aic_phy3 <- AIC(models_phy3)
-
-# Imprimir os AICs
-print(c("AIC - Lima et al (2018)" = aic_phy1, "AIC - Wright et al (2015)" = aic_phy2, "AIC - Upham et al (2019)" = aic_phy3))
-
-# Comparar os valores de log-likelihood (opcional)
-logLik_phy1 <- logLik(models_phy1)
-logLik_phy2 <- logLik(models_phy2)
-logLik_phy3 <- logLik(models_phy3)
-
-print(c("Log-likelihood - Lima et al (2018)" = logLik_phy1, "Log-likelihood - Wright et al (2015)" = logLik_phy2, "Log-likelihood - Upham et al (2019)" = logLik_phy3))
-
-# Modelos univariados
-model_bio2 <- pgls.SEy(CS ~ bio2, data = bio_data, tree = phy1)
-model_bio3 <- pgls.SEy(CS ~ bio3, data = bio_data, tree = phy1)
-model_bio8 <- pgls.SEy(CS ~ bio8, data = bio_data, tree = phy1)
-model_bio12 <- pgls.SEy(CS ~ bio12, data = bio_data, tree = phy1)
-model_bio18 <- pgls.SEy(CS ~ bio18, data = bio_data, tree = phy1)
-model_soil <- pgls.SEy(CS ~ soilmoist, data = bio_data, tree = phy1)
-
-# Resumos dos modelos
-summary(model_bio2)
-summary(model_bio3)#
-summary(model_bio8)
-summary(model_bio12)#
-summary(model_bio18)#
-summary(model_soil)#
-
-model_bio2 <- pgls.SEy(CS ~ bio2 + pcnm1 + pcnm5, data = bio_data, tree = phy1)
-model_bio3 <- pgls.SEy(CS ~ bio3 + pcnm1 + pcnm5, data = bio_data, tree = phy1)
-model_bio10 <- pgls.SEy(CS ~ bio10 + pcnm1 + pcnm5, data = bio_data, tree = phy1)
-model_bio12 <- pgls.SEy(CS ~ bio12 + pcnm1 + pcnm5, data = bio_data, tree = phy1)
-model_bio18 <- pgls.SEy(CS ~ bio18 + pcnm1 + pcnm5, data = bio_data, tree = phy1)
-model_soil <- pgls.SEy(CS ~ soilmoist + pcnm1 + pcnm5, data = bio_data, tree = phy1)
-
-# Resumos dos modelos
-summary(model_bio2)
-summary(model_bio3)
-summary(model_bio10)#
-summary(model_bio12)#
-summary(model_bio18)#
-summary(model_soil)
-
-# Carregar pacotes necessários
-library(ggplot2)
-#install.packages("caret")
-library(caret)
-
-# 1. Comparação Gráfica dos Modelos
-# Criar um dataframe com os dados observados e preditos para cada modelo
-predictions_phy1 <- predict(models_phy1)
-predictions_phy2 <- predict(models_phy2)
-predictions_phy3 <- predict(models_phy3)
-
-# Plotar os resíduos dos modelos
-par(mfrow = c(3, 1)) # Organizar os gráficos em uma coluna
-plot(residuals(models_phy1), main = "Resíduos - Lima (2018)", ylab = "Resíduos", xlab = "Observações")
-abline(h = 0, col = "red")
-plot(residuals(models_phy2), main = "Resíduos - Wright (2015)", ylab = "Resíduos", xlab = "Observações")
-abline(h = 0, col = "red")
-plot(residuals(models_phy3), main = "Resíduos - Upham (2019)", ylab = "Resíduos", xlab = "Observações")
-abline(h = 0, col = "red")
-
-
-# 2
-
-# Analisar a normalidade dos resíduos com um histograma e QQ-plot
-par(mfrow = c(3, 2)) # Organizar os gráficos
-hist(residuals(models_phy1), main = "Histograma dos Resíduos - Lima (2018)", xlab = "Resíduos")
-qqnorm(residuals(models_phy1))
-qqline(residuals(models_phy1), col = "red")
-
-hist(residuals(models_phy2), main = "Histograma dos Resíduos - Wright (2015)", xlab = "Resíduos")
-qqnorm(residuals(models_phy2))
-qqline(residuals(models_phy2), col = "red")
-
-hist(residuals(models_phy3), main = "Histograma dos Resíduos - Upham (2019)", xlab = "Resíduos")
-qqnorm(residuals(models_phy3))
-qqline(residuals(models_phy3), col = "red")
-
-# Modelo Browniano
-model_brownian <- pgls.SEy(CS ~ bio3 + bio10 + bio12 + bio18 + soilmoist, data = bio_data, tree = phy1, corClass=corBrownian)
+# Load required packages
 library(ape)
+library(phylolm)
 
-bio_data$sp <- as.factor(data$sp_ives)
+# Load your 3 phylogenies
+tree_lima <- read.tree("Datasets/trees/AVGLOCSEX_Lima.tre")
+tree_upham <- read.tree("Datasets/trees/AVGLOCSEX_Upham.tre")
+tree_wright <- read.tree("Datasets/trees/AVGLOCSEX_Wright.tre")
 
-# Modelo Ornstein-Uhlenbeck
-model_ou <- pgls.SEy(CS ~ bio3 + bio10 + bio12 + bio18 + soilmoist, data = bio_data, tree = phy1, corClass=corMartins)
+# Load your data WITHOUT setting row names yet
+original_data <- read.csv("Planilhas/avglocsex.csv", sep = ";")
 
-model_pagel <- pgls.SEy(CS ~ bio3 + bio10 + bio12 + bio18 + soilmoist, data = bio_data, tree = phy1, corClass=corPagel)
 
-# AIC dos modelos
-aic_brownian <- AIC(model_brownian)
-aic_ou <- AIC(model_ou)
-aic_pagel <- AIC(model_pagel)
+# --- CRITICAL CORRECTION STEP ---
 
-# Log-likelihood dos modelos
-logLik_brownian <- logLik(model_brownian)
-logLik_ou <- logLik(model_ou)
-logLik_pagel <- logLik(model_pagel)
+# Inspect your data frame to find the column name with the IDs
+# Run this command to see all column names:
+# names(original_data) 
 
-# Imprimir os resultados
-print(c("AIC - Modelo Browniano" = aic_brownian, "AIC - Modelo OU" = aic_ou, "AIC - Modelo Pagel" = aic_pagel))
-print(c("Log-likelihood - Modelo Browniano" = logLik_brownian, "Log-likelihood - Modelo OU" = logLik_ou, "Log-likelihood - Modelo Pagel" = logLik_pagel))
+# Assuming the column with names like 'Sapajus_robustus_8', etc., is called "sp_ives".
+# **REPLACE 'sp_ives' WITH THE CORRECT COLUMN NAME IF DIFFERENT.**
+# This line will set the row names of your data frame from that column.
+rownames(original_data) <- original_data$sp_ives
 
-# Pagel's !!!
-c("bio4", "bio10", "bio12", "bio13", "bio14", "bio16", "bio17", "bio18", "humid", "soilmoist")
+# As a safety measure, ensure there are no spaces (replace with "_")
+rownames(original_data) <- gsub(" ", "_", rownames(original_data))
 
+
+# --- SYNCHRONIZATION (should work now) ---
+
+# Put the original trees in a named list
+original_tree_list <- list(
+  Lima2018 = tree_lima,
+  Upham2019 = tree_upham,
+  Wright2015 = tree_wright
+)
+
+# Find the common species between ALL trees and the DATA
+common_species <- rownames(original_data)
+for (tree_name in names(original_tree_list)) {
+  common_species <- intersect(common_species, original_tree_list[[tree_name]]$tip.label)
+}
+
+# Verification check
+if (length(common_species) == 0) {
+  stop("ERROR: No common species found. Check if the column name used for row names is correct.")
+} else {
+  cat(paste("\nSuccess! Found", length(common_species), "common samples.\n"))
+}
+
+# Filter the final data frame
+final_data <- original_data[common_species, ]
+
+# Prune the trees and create the final list
+tree_list <- list()
+for (tree_name in names(original_tree_list)) {
+  original_tree <- original_tree_list[[tree_name]]
+  tree_list[[tree_name]] <- drop.tip(original_tree, setdiff(original_tree$tip.label, common_species))
+}
+
+cat("Synchronization complete. You can now proceed to the AIC analysis.\n")
+
+#################################################################
+# STEP 4: COMPARING PHYLOGENIES WITH AIC AND AKAIKE WEIGHTS (CORRECTED VERSION)
+#################################################################
+
+# Create a data frame to store the comparison results
+comparison_results <- data.frame(
+  Phylogeny = names(tree_list),
+  AIC = numeric(length(tree_list))
+)
+
+cat("Starting phylogeny comparison via AIC...\n")
+
+# Loop to fit the model on each tree from your clean list of trees
+for (i in 1:nrow(comparison_results)) {
+  
+  tree_name <- comparison_results$Phylogeny[i]
+  current_tree <- tree_list[[tree_name]]
+  
+  # --- START OF CORRECTION ---
+  # Remove the "root edge" from the tree, if it exists.
+  current_tree$root.edge <- NULL
+  # --- END OF CORRECTION ---
+  
+  # Ensure the data is in the same order as the current tree (good practice)
+  ordered_data <- final_data[current_tree$tip.label, ]
+  
+  cat(paste("...Fitting model for tree:", tree_name, "\n"))
+  
+  # Fit the phylogenetic linear model with 'phylolm'
+  # Replace 'log(CS) ~ bio12' with your main relationship of interest.
+  fit <- try(phylolm(log(CS) ~ bio12, data = ordered_data, phy = current_tree, model = "lambda"))
+  
+  # Store the AIC value if the model ran successfully
+  if (!inherits(fit, "try-error")) {
+    comparison_results$AIC[i] <- AIC(fit)
+  } else {
+    comparison_results$AIC[i] <- NA # Mark as NA if the model failed
+    cat(paste("!!! WARNING: The model for tree", tree_name, "failed to converge. !!!\n"))
+  }
+}
+
+# --- Calculation of Akaike Weights ---
+
+# Remove any rows where the model may have failed
+comparison_results <- na.omit(comparison_results)
+
+# Find the lowest AIC value (the best model in the set)
+min_aic <- min(comparison_results$AIC)
+
+# Calculate Delta AIC (ΔAIC): the difference of each model from the best one
+comparison_results$delta_AIC <- comparison_results$AIC - min_aic
+
+# Calculate the Akaike Weight
+comparison_results$akaike_weight <- exp(-0.5 * comparison_results$delta_AIC) / sum(exp(-0.5 * comparison_results$delta_AIC))
+
+# Round the results for better visualization
+comparison_results <- transform(comparison_results,
+                                AIC = round(AIC, 2),
+                                delta_AIC = round(delta_AIC, 2),
+                                akaike_weight = round(akaike_weight, 4)
+)
+
+
+cat("\n#################################################\n")
+cat("--- FINAL COMPARISON RESULT ---\n")
+cat("#################################################\n")
+print(comparison_results)
+
+# Identify the winning phylogeny
+if(nrow(comparison_results) > 0) {
+  winning_phylogeny <- comparison_results[which.min(comparison_results$AIC), ]
+  cat("\nConclusion: The phylogeny with the most statistical support is '", winning_phylogeny$Phylogeny, "'\n", sep = "")
+} else {
+  cat("\nConclusion: No model converged successfully. Check your data and trees.\n")
+}
