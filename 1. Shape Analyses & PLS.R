@@ -104,8 +104,8 @@ grid.pars <- gridPar(grid.col = "white") ## if you want only the "invisible" gri
 
 
 GP <- gridPar(n.col.cell = 100, pt.bg = "gray", pt.size = 0.8, tar.pt.bg = "cyan",
-tar.pt.size = 0.8, tar.out.col = "gray10", tar.out.cex = 0.5,
-grid.col = "white", grid.lwd = 0.5, txt.pos = 1, txt.col = "steelblue") ## Custom grids
+              tar.pt.size = 0.8, tar.out.col = "gray10", tar.out.cex = 0.5,
+              grid.col = "white", grid.lwd = 0.5, txt.pos = 1, txt.col = "steelblue") ## Custom grids
 
 plotRefToTarget(mshape,Y.gpa$coords[,,90],outline = Sapajusoutline$outline,method="points", gridPars=GP)
 
@@ -123,12 +123,12 @@ summary(PCA)
 ### Basically, the parameters to customize the plots
 
 symbols <- c(
-Sapajus_apella = "\u25A0", # Square
-Sapajus_cay = "\u25BC", # Downward-pointing triangle
-Sapajus_libidinosus = "\u25B2", # Upward-pointing triangle
-Sapajus_nigritus = "\u25CF", # Circle
-Sapajus_robustus = "\u2726", # 6-pointed star
-Sapajus_xanthosternos = "\u2736" # 8-pointed star
+  Sapajus_apella = "\u25A0", # Square
+  Sapajus_cay = "\u25BC", # Downward-pointing triangle
+  Sapajus_libidinosus = "\u25B2", # Upward-pointing triangle
+  Sapajus_nigritus = "\u25CF", # Circle
+  Sapajus_robustus = "\u2726", # 6-pointed star
+  Sapajus_xanthosternos = "\u2736" # 8-pointed star
 )
 symbols <- symbols[as.character(species)]
 
@@ -142,11 +142,11 @@ names(colors_fac) <- levels_fac
 indv <- 1:nrow(PCA$x)
 
 pca_df <- data.frame( 
-PC1 = PCA$x[, "Comp1"], 
-PC2 = PCA$x[, "Comp2"], 
-PC3 = PCA$x[, "Comp3"], 
-Species = species, 
-Individual = 1:nrow(PCA$x), Fac = Fac, Sex = sex)
+  PC1 = PCA$x[, "Comp1"], 
+  PC2 = PCA$x[, "Comp2"], 
+  PC3 = PCA$x[, "Comp3"], 
+  Species = species, 
+  Individual = 1:nrow(PCA$x), Fac = Fac, Sex = sex)
 
 species_colors <- c("red","navy","cyan3","saddlebrown","magenta4","black")
 names(species_colors) <- levels(pca_df$Species)
@@ -164,7 +164,7 @@ xlab <- paste("PC1 (", round(100 * PCA$sdev[1]^2 / sum(PCA$sdev^2), 1), "%)", se
 ylab <- paste("PC2 (", round(100 * PCA$sdev[2]^2 / sum(PCA$sdev^2), 1), "%)", sep = "")
 
 plot(PCA$x[,1],PCA$x[,2],cex=4,pch = 21, bg=colors_fac, xlab=xlab,ylab=ylab, 
-col = colors_fac)
+     col = colors_fac)
 legend("topright",legend= unique(Fac),pch=19,col = unique(colors_fac), cex = 2, pt.cex = 3)
 
 plotRefToTarget(mshape,PCA$shapes$shapes.comp1$min, mag = 2,outline = Sapajusoutline$outline,method="points",gridPars=GP)
@@ -253,27 +253,27 @@ ggplot(pca_df, aes(x = PC1, y = PC2)) +
     y = paste("PC2 (", round(100 * PCA$sdev[2]^2 / sum(PCA$sdev^2), 1), "%)", sep = ""), 
     shape = "Species", color = "Sex"
   ) +
- theme_minimal() + 
-scale_shape_manual(values ​​= uPCH, labels = levels(pca_df$Species), name = "Species") + 
-scale_color_manual(values ​​= colors_sex, name = "Sex") + # Define `colors_sex` with the colors corresponding to the sexes 
-scale_fill_manual(values ​​= colors_sex, name = "Sex")
+  theme_minimal() + 
+  scale_shape_manual(values = uPCH, labels = levels(pca_df$Species), name = "Species") + 
+  scale_color_manual(values = colors_sex, name = "Sex") + # Define `colors_sex` with the colors corresponding to the sexes 
+  scale_fill_manual(values = colors_sex, name = "Sex")
 
 PC1 <- PCA$x[, 1] # Scores for PC1
 PC2 <- PCA$x[, 2] # Scores for PC2
 PC3 <- PCA$x[, 3]
 
 preds_comb <- shape.predictor( 
-gpa$coords, 
-x = cbind(PC1, PC2), # Use PC1 and PC2 together 
-Intercept = FALSE, 
-pred1 = c(min(PC1), min(PC2)), # Min PC1 + Min PC2 
-pred2 = c(max(PC1), min(PC2)), # Max PC1 + Min PC2
-pred3 = c(min(PC1), max(PC2)), # Min PC1 + Max PC2
-pred4 = c(max(PC1), max(PC2)), # Max PC1 + Max PC2
-pred5 = c(min(PC2), min(PC3)),
-pred6 = c(min(PC2), max(PC3)),
-pred7 = c(max(PC2), min(PC3)),
-pred8 = c(max(PC2), max(PC3))
+  gpa$coords, 
+  x = cbind(PC1, PC2), # Use PC1 and PC2 together 
+  Intercept = FALSE, 
+  pred1 = c(min(PC1), min(PC2)), # Min PC1 + Min PC2 
+  pred2 = c(max(PC1), min(PC2)), # Max PC1 + Min PC2
+  pred3 = c(min(PC1), max(PC2)), # Min PC1 + Max PC2
+  pred4 = c(max(PC1), max(PC2)), # Max PC1 + Max PC2
+  pred5 = c(min(PC2), min(PC3)),
+  pred6 = c(min(PC2), max(PC3)),
+  pred7 = c(max(PC2), min(PC3)),
+  pred8 = c(max(PC2), max(PC3))
 )
 
 M <- mshape(gpa$coords)
@@ -299,33 +299,33 @@ par(mfrow = c(1, 1))
 compute_hull <- function(pca_df) pca_df[chull(pca_df$PC1, pca_df$PC2), ]
 
 hulls <- pca_df %>% 
-group_by(Sex, Fac) %>% # Separate by `Sex` and `Fac` 
-do(compute_hull(.)) %>% 
-ungroup()
+  group_by(Sex, Fac) %>% # Separate by `Sex` and `Fac` 
+  do(compute_hull(.)) %>% 
+  ungroup()
 
 hulls <- hulls %>% 
-mutate(Sex = factor(Sex), Fac = factor(Fac))
+  mutate(Sex = factor(Sex), Fac = factor(Fac))
 
 ggplot(pca_df, aes(x = PC1, y = PC2)) + 
-geom_point(aes(shape = Species, color = Fac), size = 6) + 
-geom_text(aes(label = Individual), size = 2, vjust = 2) + 
-geom_polygon( 
-data = hulls, 
-aes(x = PC1, y = PC2, group = interaction(Sex, Fac), fill = Fac, color = Fac), 
-alpha = 0.2, # Opacity for fill 
-linewidth = 1 # Outline thickness for highlighting 
-) + 
-labs( 
-title = "Shape's Principal Components (Separated by Sex)", 
-x = paste("PC1 (", round(100 * PCA$sdev[1]^2 / sum(PCA$sdev^2), 1), "%)", sep = ""), 
-y = paste("PC2 (", round(100 * PCA$sdev[2]^2 / sum(PCA$sdev^2), 1), "%)", sep = ""), 
-shape = "Species", color = "Environment", fill = "Environment" 
-) + 
-theme_minimal() + 
-scale_shape_manual(values ​​= uPCH, labels = levels(pca_df$Species), name = "Species") + 
-scale_color_manual(values ​​= colors_fac, name = "Environment") + 
-scale_fill_manual(values ​​= colors_fac, name = "Environment") + 
-facet_wrap(~Sex) # Separate by sex
+  geom_point(aes(shape = Species, color = Fac), size = 6) + 
+  geom_text(aes(label = Individual), size = 2, vjust = 2) + 
+  geom_polygon( 
+    data = hulls, 
+    aes(x = PC1, y = PC2, group = interaction(Sex, Fac), fill = Fac, color = Fac), 
+    alpha = 0.2, # Opacity for fill 
+    linewidth = 1 # Outline thickness for highlighting 
+  ) + 
+  labs( 
+    title = "Shape's Principal Components (Separated by Sex)", 
+    x = paste("PC1 (", round(100 * PCA$sdev[1]^2 / sum(PCA$sdev^2), 1), "%)", sep = ""), 
+    y = paste("PC2 (", round(100 * PCA$sdev[2]^2 / sum(PCA$sdev^2), 1), "%)", sep = ""), 
+    shape = "Species", color = "Environment", fill = "Environment" 
+  ) + 
+  theme_minimal() + 
+  scale_shape_manual(values = uPCH, labels = levels(pca_df$Species), name = "Species") + 
+  scale_color_manual(values = colors_fac, name = "Environment") + 
+  scale_fill_manual(values = colors_fac, name = "Environment") + 
+  facet_wrap(~Sex) # Separate by sex
 
 par(mfrow=c(1,2))
 
@@ -333,7 +333,7 @@ scorespc1<-PCA$x[,1] #scores for pc1
 scorespc2<-PCA$x[,2] #scores for pc2
 scorespc3<-PCA$x[,3] #scores for pc2
 
-### View the shapes related to the extreme values ​​of each PC
+### View the shapes related to the extreme values of each PC
 
 predsPC1 <- shape.predictor(gpa$coords, scorespc1, Intercept = TRUE, predmin = min(scorespc1), predmax = max(scorespc1)) #estimating shape configurations based on pc scores
 plotRefToTarget(mshape, predsPC1$predmin, mag=2, outline = Sapajusoutline$outline,gridPars = GP,  method = "points") #shape related to small pc scores
@@ -382,62 +382,62 @@ size_correlations <- correlation
 bio_cor <- correlation_bio
 
 names(bio_cor) <- c("Comp1", "Comp2", "Comp3", "Comp4", "Comp5", "Comp6", 
-"Comp7", "Comp8", "Comp9", "Comp10", "Comp11", "Comp12", 
-"Comp13", "Comp14", "Comp15", "Comp16", "Comp17", "Comp18", 
-"Comp19", "Comp20", "Comp21", "Comp22", "Comp23", "Comp24", 
-"Comp25", "Comp26", "Comp27", "Comp28", "Comp29", "Comp30", 
-"Comp31", "Comp32")
+                    "Comp7", "Comp8", "Comp9", "Comp10", "Comp11", "Comp12", 
+                    "Comp13", "Comp14", "Comp15", "Comp16", "Comp17", "Comp18", 
+                    "Comp19", "Comp20", "Comp21", "Comp22", "Comp23", "Comp24", 
+                    "Comp25", "Comp26", "Comp27", "Comp28", "Comp29", "Comp30", 
+                    "Comp31", "Comp32")
 names(size_correlations) <- c("Comp1", "Comp2", "Comp3", "Comp4", "Comp5", "Comp6", 
-"Comp7", "Comp8", "Comp9", "Comp10", "Comp11", "Comp12", 
-"Comp13", "Comp14", "Comp15", "Comp16", "Comp17", "Comp18", 
-"Comp19", "Comp20", "Comp21", "Comp22", "Comp23", "Comp24", 
-"Comp25", "Comp26", "Comp27", "Comp28", "Comp29", "Comp30", 
-"Comp31", "Comp32")
+                              "Comp7", "Comp8", "Comp9", "Comp10", "Comp11", "Comp12", 
+                              "Comp13", "Comp14", "Comp15", "Comp16", "Comp17", "Comp18", 
+                              "Comp19", "Comp20", "Comp21", "Comp22", "Comp23", "Comp24", 
+                              "Comp25", "Comp26", "Comp27", "Comp28", "Comp29", "Comp30", 
+                              "Comp31", "Comp32")
 
 
 correlation_df <- data.frame(PC = names(bio_cor), Bio = bio_cor, Size = size_correlations)
 
 correlation_df$PC <- factor(correlation_df$PC, 
-levels = c("Comp1", "Comp2", "Comp3", "Comp4", "Comp5", 
-"Comp6", "Comp7", "Comp8", "Comp9", "Comp10", 
-"Comp11", "Comp12", "Comp13", "Comp14", 
-"Comp15", "Comp16", "Comp17", "Comp18", 
-"Comp19", "Comp20", "Comp21", "Comp22", 
-"Comp23", "Comp24", "Comp25", "Comp26", 
-"Comp27", "Comp28", "Comp29", "Comp30", 
-"Comp31", "Comp32"))
+                            levels = c("Comp1", "Comp2", "Comp3", "Comp4", "Comp5", 
+                                       "Comp6", "Comp7", "Comp8", "Comp9", "Comp10", 
+                                       "Comp11", "Comp12", "Comp13", "Comp14", 
+                                       "Comp15", "Comp16", "Comp17", "Comp18", 
+                                       "Comp19", "Comp20", "Comp21", "Comp22", 
+                                       "Comp23", "Comp24", "Comp25", "Comp26", 
+                                       "Comp27", "Comp28", "Comp29", "Comp30", 
+                                       "Comp31", "Comp32"))
 
 ggplot(correlation_df, aes(x = PC, y = Bio, fill = Bio)) + 
-geom_bar(stat = "identity") + 
-scale_fill_gradientn(colors = c("red", "gray80", "steelblue"), 
-values ​​= scales::rescale(c(-0.5, 0, 0.5)), 
-name = "Color") + 
-theme_classic() + 
-labs(title = "Correlogram: Main Components vs. Biome", 
-x = "Main Components", 
-y = "Correlation") + 
-theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  geom_bar(stat = "identity") + 
+  scale_fill_gradientn(colors = c("red", "gray80", "steelblue"), 
+                       values = scales::rescale(c(-0.5, 0, 0.5)), 
+                       name = "Color") + 
+  theme_classic() + 
+  labs(title = "Correlogram: Main Components vs. Biome", 
+       x = "Main Components", 
+       y = "Correlation") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 correlation_df$PC <- factor(correlation_df$PC, 
-levels = c("Comp1", "Comp2", "Comp3", "Comp4", "Comp5", 
-"Comp6", "Comp7", "Comp8", "Comp9", "Comp10", 
-"Comp11", "Comp12", "Comp13", "Comp14", 
-"Comp15", "Comp16", "Comp17", "Comp18", 
-"Comp19", "Comp20", "Comp21", "Comp22", 
-"Comp23", "Comp24", "Comp25", "Comp26", 
-"Comp27", "Comp28", "Comp29", "Comp30", 
-"Comp31", "Comp32"))
+                            levels = c("Comp1", "Comp2", "Comp3", "Comp4", "Comp5", 
+                                       "Comp6", "Comp7", "Comp8", "Comp9", "Comp10", 
+                                       "Comp11", "Comp12", "Comp13", "Comp14", 
+                                       "Comp15", "Comp16", "Comp17", "Comp18", 
+                                       "Comp19", "Comp20", "Comp21", "Comp22", 
+                                       "Comp23", "Comp24", "Comp25", "Comp26", 
+                                       "Comp27", "Comp28", "Comp29", "Comp30", 
+                                       "Comp31", "Comp32"))
 
 ggplot(correlation_df, aes(x = PC, y = Size, fill = Size)) + 
-geom_bar(stat = "identity") + 
-scale_fill_gradientn(colors = c("red", "gray80", "steelblue"), 
-values ​​= scales::rescale(c(-0.5, 0, 0.5)), 
-name = "Color") + 
-theme_classic() + 
-labs(title = "Correlogram: Main Components vs. Size", 
-x = "Main Components", 
-y = "Correlation") + 
-theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  geom_bar(stat = "identity") + 
+  scale_fill_gradientn(colors = c("red", "gray80", "steelblue"), 
+                       values = scales::rescale(c(-0.5, 0, 0.5)), 
+                       name = "Color") + 
+  theme_classic() + 
+  labs(title = "Correlogram: Main Components vs. Size", 
+       x = "Main Components", 
+       y = "Correlation") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 ### this tells us if the correlation is likely
@@ -448,25 +448,25 @@ print(test_result)
 par(mfrow=c(3,1))
 
 plot(pca_data$Size, PC1,
-main = "Relationship between PC1 and logCS", xlab = "logCS", ylab = "PC1",
-pch = 21, bg = colors_fac, col = colors_fac, cex = 2) +
-abline(lm(PC1~Size, pca_data), col = "red")
+     main = "Relationship between PC1 and logCS", xlab = "logCS", ylab = "PC1",
+     pch = 21, bg = colors_fac, col = colors_fac, cex = 2) +
+  abline(lm(PC1~Size, pca_data), col = "red")
 
 test_result <- color.test(PC2, size, method = "pearson")
 print(test_result)
 
 plot(pca_data$Size, PC2,
-main = "Relationship between PC2 and logCS", xlab = "logCS", ylab = "PC2",
-pch = 21, bg = colors_fac, col = colors_fac, cex = 2) + 
-abline(lm(PC2~Size,pca_data), col = "red")
+     main = "Relationship between PC2 and logCS", xlab = "logCS", ylab = "PC2",
+     pch = 21, bg = colors_fac, col = colors_fac, cex = 2) + 
+  abline(lm(PC2~Size,pca_data), col = "red")
 
 test_result <- cor.test(PC3, size, method = "pearson")
 print(test_result)
 
 plot(pca_data$Size, PC3, 
-main = "Relationship between PC3 and logCS", xlab = "logCS", ylab = "PC3", 
-pch = 21, bg = colors_fac, col = colors_fac, cex = 2) + 
-abline(lm(PC3~Size,pca_data), col = "blue")
+     main = "Relationship between PC3 and logCS", xlab = "logCS", ylab = "PC3", 
+     pch = 21, bg = colors_fac, col = colors_fac, cex = 2) + 
+  abline(lm(PC3~Size,pca_data), col = "blue")
 
 #================================# CVA #================================####
 
@@ -616,16 +616,16 @@ legend(+2.5,+3,legend=unique(Fac),pch=19,col=unique(colors_fac),title = "Ecoregi
 # add 95% ellipses
 if (require(car)) {
   for(ii in 1:length(levels(Fac))){
-    dataEllipse(cva.1$CVscores[Fac==levels(Fac)[ii],1],
-                cva.1$CVscores[Fac==levels(Fac)[ii],2], 
-                add=TRUE,levels=.95, col=unique(cores_CVA)[ii])}
+    dataEllipse(cva_results$CVscores[Fac==levels(Fac)[ii],1],
+                cva_results$CVscores[Fac==levels(Fac)[ii],2], 
+                add=TRUE,levels=.95, col=unique(colors_fac)[ii])}
 }
 
 #ordiellipse(cva$CVscores,group = fac,kind = "sd",conf = 0.95,col = legend_colors,lwd = 2)
 
 text(
-  cva$CVscores,
-  labels = rownames(cva$CVscores),
+  cva_results$CVscores,
+  labels = rownames(cva_results$CVscores),
   cex = 0.7,
   col = "black"
 )
@@ -637,25 +637,36 @@ plotRefToTarget(mshape,cv2_max_shape,outline = Sapajusoutline$outline,gridPars =
 par(mfrow=c(1,1))
 
 
-GP <- gridPar(
-  pt.size = 0.8,
-  pt.bg = "black",
-  link.col = "darkgray",
-  link.lwd = 1.5,
-  out.col = "black",
-  out.lwd = 2,
-  tar.pt.bg = "black",
-  tar.pt.size = 1,
-  ref.pt.bg = "gray",
-  ref.pt.size = 0.8
-)
-GP
+
 # --- 2. Set up a 1x2 Plot Layout for side-by-side comparison ---
 par(mfrow = c(1, 2), mar = c(1, 1, 2, 1))
 
 # --- 3. Generate the Deformation Plots ---
 
-# Plot 1: Savanna (Reference) vs. Amazon Forest (Target)
+GP <- gridPar(n.col.cell = 100, pt.bg = "gray", 
+              pt.size = 0.8, tar.pt.bg = "black",
+              tar.pt.size = 0.8, tar.out.col = "goldenrod", 
+              tar.out.cex = 0.5, grid.col = "white", 
+              grid.lwd = 0.5, txt.pos = 1, 
+              txt.col = "steelblue", out.col = "green")
+# Plot 1: AF (Reference) vs. SV (Target)
+plotRefToTarget(
+  cva_results$groupmeans[, , "AF"], # Reference shape
+  cva_results$groupmeans[, , "SV"], # Target shape
+  outline = Sapajusoutline$outline,
+  gridPars = GP,
+  method = "points",
+  mag = 2
+)
+title("Atlantic Forest to Savanna", cex.main = 1.5)
+
+# Plot 2: SV (Reference) vs. AM (Target)
+GP <- gridPar(n.col.cell = 100, pt.bg = "gray", 
+              pt.size = 0.8, tar.pt.bg = "black",
+              tar.pt.size = 0.8, tar.out.col = "darkgreen", 
+              tar.out.cex = 0.5, grid.col = "white", 
+              grid.lwd = 0.5, txt.pos = 1, 
+              txt.col = "steelblue", out.col = "goldenrod")
 plotRefToTarget(
   cva_results$groupmeans[, , "SV"], # Reference shape
   cva_results$groupmeans[, , "AM"], # Target shape
@@ -665,18 +676,6 @@ plotRefToTarget(
   mag = 2
 )
 title("Savanna to Amazon Forest", cex.main = 1.5)
-
-# Plot 2: Savanna (Reference) vs. Atlantic Forest (Target)
-plotRefToTarget(
-  cva_results$groupmeans[, , "SV"], # Reference shape
-  cva_results$groupmeans[, , "AF"], # Target shape
-  outline = Sapajusoutline$outline,
-  gridPars = GP,
-  method = "points",
-  mag = 2
-)
-title("Savanna to Atlantic Forest", cex.main = 1.5)
-
 
 # --- 4. Reset Plot Layout to Default ---
 par(mfrow = c(1, 1))
@@ -1132,7 +1131,7 @@ create_pls_plot <- function(pls_result, title) {
   names(ecoregion_colors) <- levels(gdf$Ecoregion)
   ecoregion_shapes <- c(16, 15, 17) # Example shapes
   names(ecoregion_shapes) <- levels(gdf$Ecoregion)
-
+  
   ggplot(df_plot, aes(x = PLS1, y = PLS2)) +
     geom_point(aes(color = Ecoregion, shape = Ecoregion), size = 6, alpha = 0.8) +
     scale_color_manual(values = ecoregion_colors) +
